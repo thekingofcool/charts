@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,9 +20,7 @@
   --orange:  #ff9a3c;
   --orange2: #cc6800;
   --red:     #ff5a6e;
-  --red2:    #cc2238;
   --green:   #36c97e;
-  --green2:  #1a8a52;
   --px: 1px;
   --mono: 'Share Tech Mono', monospace;
   --pixel: 'Press Start 2P', monospace;
@@ -43,13 +41,10 @@ header {
   border-bottom: 1px solid var(--border);
   padding: 12px 24px;
   display: flex; align-items: center; gap: 16px;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
   position: sticky; top: 0; z-index: 200;
 }
-.logo {
-  font-family: var(--pixel); font-size: 14px;
-  color: var(--blue); letter-spacing: 2px;
-}
+.logo { font-family: var(--pixel); font-size: 14px; color: var(--blue); letter-spacing: 2px; }
 .ticker-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
 .ticker-btn {
   font-family: var(--pixel); font-size: 10px;
@@ -63,10 +58,8 @@ header {
 
 .controls {
   background: var(--bg2); border-bottom: 1px solid var(--border);
-  padding: 8px 24px; display: flex; gap: 12px; align-items: center;
-  flex-wrap: wrap; 
+  padding: 8px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
 }
-.ctrl-label { font-family: var(--pixel); font-size: 10px; color: var(--ink3); text-transform: uppercase; }
 .period-picker { display: flex; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 .period-btn {
   font-family: var(--pixel); font-size: 10px; padding: 8px 14px;
@@ -80,51 +73,36 @@ main {
   padding: 20px 24px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
   gap: 16px;
   max-width: 1600px;
   margin: 0 auto;
 }
 .col-full { grid-column: 1 / -1; }
 
-.card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 .card-header {
   padding: 12px 16px;
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
   background: var(--bg3);
 }
-.card-title {
-  font-family: var(--pixel); font-size: 12px; color: var(--ink); letter-spacing: 1px;
-}
+.card-title { font-family: var(--pixel); font-size: 12px; color: var(--ink); letter-spacing: 1px; }
 .card-body { padding: 16px; }
 
 .chart-scroll-wrap {
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) var(--bg3);
+  width: 100%; overflow-x: auto; overflow-y: hidden;
+  scrollbar-width: thin; scrollbar-color: var(--border) var(--bg3);
 }
 
 .sankey-nav { display: flex; align-items: center; gap: 8px; }
 .nav-arrow {
   width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
   background: var(--bg4); border: 1px solid var(--border); border-radius: 4px;
-  color: var(--ink2); cursor: pointer; font-size: 14px; user-select: none;
-  transition: all .1s;
+  color: var(--ink2); cursor: pointer; font-size: 14px; user-select: none; transition: all .1s;
 }
 .nav-arrow:hover { border-color: var(--blue); color: var(--blue); }
-.nav-period-label {
-  font-family: var(--pixel); font-size: 10px; color: var(--orange);
-  min-width: 80px; text-align: center;
-}
+.nav-period-label { font-family: var(--pixel); font-size: 10px; color: var(--orange); min-width: 80px; text-align: center; }
 
 .metric-tabs {
   display: flex; gap: 0;
@@ -140,6 +118,26 @@ main {
 .metric-tab.active { background: var(--bg4); color: var(--orange); }
 .metric-tab:hover:not(.active) { color: var(--ink); }
 
+/* Financial Analysis grid */
+.fin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+.fin-item {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px 14px;
+}
+.fin-label { font-size: 11px; color: var(--ink3); margin-bottom: 6px; line-height: 1.4; }
+.fin-val { font-size: 15px; color: var(--ink); font-weight: 600; }
+.fin-val.pos { color: var(--green); }
+.fin-val.neg { color: var(--red); }
+.fin-section-title {
+  font-family: var(--pixel); font-size: 10px; color: var(--ink3);
+  padding: 12px 16px 4px; letter-spacing: 1px;
+}
+
 .legend {
   display: flex; gap: 16px; flex-wrap: wrap;
   padding: 10px 0 2px; font-size: 12px; color: var(--ink2); align-items: center;
@@ -152,14 +150,11 @@ main {
 .tooltip {
   position: fixed; z-index: 999;
   background: var(--bg3); color: var(--ink);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  border: 1px solid var(--border); border-radius: 6px;
   font-family: var(--mono); font-size: 12px; line-height: 1.7;
   padding: 10px 14px;
-  pointer-events: none; opacity: 0;
-  transition: opacity .1s;
-  max-width: 220px;
-  box-shadow: 0 4px 20px rgba(0,0,0,.5);
+  pointer-events: none; opacity: 0; transition: opacity .1s;
+  max-width: 220px; box-shadow: 0 4px 20px rgba(0,0,0,.5);
 }
 .tip-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
 .tip-row { display: flex; justify-content: space-between; gap: 12px; }
@@ -168,8 +163,8 @@ main {
 .tip-beat { color: var(--green); }
 .tip-miss { color: var(--red); }
 
-@media(max-width:900px) { 
-  main { grid-template-columns: 1fr; padding: 12px; } 
+@media(max-width:900px) {
+  main { grid-template-columns: 1fr; padding: 12px; }
 }
 </style>
 </head>
@@ -183,15 +178,15 @@ main {
 
 <div class="controls">
   <div class="period-picker">
-    <button class="period-btn active" id="btn-q" onclick="setPeriod('quarterly')">季报</button>
-    <button class="period-btn" id="btn-a" onclick="setPeriod('annual')">年报</button>
+    <button class="period-btn active" id="btn-q" onclick="setPeriod('quarterly')">Quarterly</button>
+    <button class="period-btn" id="btn-a" onclick="setPeriod('annual')">Annual</button>
   </div>
 </div>
 
 <main>
   <div class="card col-full" id="card-sankey">
     <div class="card-header">
-      <span class="card-title">收支拆解</span>
+      <span class="card-title">Revenue Breakdown</span>
       <div class="sankey-nav">
         <div class="nav-arrow" id="nav-prev" onclick="shiftSankey(-1)">◀</div>
         <div class="nav-period-label" id="sankey-label">—</div>
@@ -203,27 +198,41 @@ main {
         <svg id="sankey-svg" style="width:100%;overflow:visible;display:block"></svg>
       </div>
       <div class="legend">
-        <span class="legend-item"><span class="legend-dot" style="background:var(--blue)"></span>收入</span>
-        <span class="legend-item"><span class="legend-dot" style="background:var(--orange)"></span>支出</span>
-        <span class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>损益</span>
+        <span class="legend-item"><span class="legend-dot" style="background:var(--blue)"></span>Revenue</span>
+        <span class="legend-item"><span class="legend-dot" style="background:var(--orange)"></span>Expense</span>
+        <span class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>Profit</span>
+        <span class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>Loss</span>
       </div>
     </div>
   </div>
 
   <div class="card col-full">
     <div class="card-header">
-      <span class="card-title">财报预测</span>
-      <div class="metric-tabs" id="forecast-tabs"></div>
+      <span class="card-title">Financial Analysis</span>
+      <div class="metric-tabs" id="trend-tabs"></div>
     </div>
     <div class="card-body">
       <div class="chart-scroll-wrap">
-        <svg id="forecast-svg" style="width:100%;display:block"></svg>
+        <svg id="trend-svg" style="width:100%;display:block"></svg>
       </div>
       <div class="legend">
-        <span class="legend-item"><span class="legend-dash"></span>预估</span>
-        <span class="legend-item"><span class="legend-line" style="background:var(--orange)"></span>实际</span>
+        <span class="legend-item"><span class="legend-dash"></span>Estimate</span>
+        <span class="legend-item"><span class="legend-line" style="background:var(--orange)"></span>Actual</span>
       </div>
     </div>
+  </div>
+
+  <!-- Balance Sheet + Cash Flow snapshot -->
+  <div class="card col-full" id="card-fin">
+    <div class="card-header">
+      <span class="card-title">Latest Snapshot</span>
+      <div class="sankey-nav">
+        <div class="nav-arrow" id="fin-prev" onclick="shiftFin(-1)">◀</div>
+        <div class="nav-period-label" id="fin-label">—</div>
+        <div class="nav-arrow" id="fin-next" onclick="shiftFin(+1)">▶</div>
+      </div>
+    </div>
+    <div id="fin-body"></div>
   </div>
 </main>
 
@@ -234,46 +243,57 @@ main {
 <script>
 const S = {
   tickers:[], ticker:null, period:'quarterly',
-  sankeyIdx:0, forecastMetric:'total_revenue',
-  _sankeyAll:null, _trendAll:null, _estAll:null,
-  sankey:{}, trend:{}, est:{}
+  sankeyIdx:0, finIdx:0, trendMetric:'total_revenue',
+  _sankeyAll:null, _trendAll:null, _estAll:null, _balAll:null, _cfAll:null,
+  sankey:{}, trend:{}, est:{}, bal:{}, cf:{}
 };
 
-const METRIC_LABELS = {
-  total_revenue:'总收入', eps_diluted:'每股收益', operating_income:'营业利润'
+const TREND_LABELS = {
+  total_revenue:    'Revenue',
+  gross_profit:     'Gross Profit',
+  operating_income: 'Op. Income',
+  net_income:       'Net Income',
+  eps_diluted:      'Diluted EPS',
+  ebitda:           'EBITDA',
 };
 
 const C = {
   revenue: '#4a8fff',
-  cogs:    '#c87832',
-  gross:   '#c04040',
-  rd:      '#d4922a',
-  sga:     '#b87828',
-  opInc:   '#c04040',
+  cogs:    '#ff9a3c',
+  gross:   '#36c97e',
+  rd:      '#ff9a3c',
+  sga:     '#cc6800',
+  opInc:   '#36c97e',
   opLoss:  '#ff5a6e',
-  tax:     '#9a8060',
-  netInc:  '#c04040',
+  tax:     '#5a6280',
+  netInc:  '#36c97e',
   netLoss: '#ff5a6e',
+  interest:'#a0a8bc',
 };
 
 const tipEl = document.getElementById('tooltip');
 function showTip(html, e) {
-  tipEl.innerHTML = html; tipEl.style.opacity=1;
-  const x = Math.min(e.clientX+14, window.innerWidth-240);
-  const y = Math.max(e.clientY-10, 4);
-  tipEl.style.left=x+'px'; tipEl.style.top=y+'px';
+  tipEl.innerHTML = html; tipEl.style.opacity = 1;
+  const x = Math.min(e.clientX + 14, window.innerWidth - 240);
+  const y = Math.max(e.clientY - 10, 4);
+  tipEl.style.left = x + 'px'; tipEl.style.top = y + 'px';
 }
-function hideTip() { tipEl.style.opacity=0; }
+function hideTip() { tipEl.style.opacity = 0; }
 
 function fmt(v, metric) {
-  if (v==null||isNaN(v)) return '—';
-  if (metric==='eps_diluted') return (v<0?'':'+') + v.toFixed(2);
-  const s=v<0?'-':'', a=Math.abs(v);
-  if (a>=1e8) return s+(a/1e8).toFixed(2)+'亿';
-  if (a>=1e4) return s+(a/1e4).toFixed(2)+'万';
-  return s+a.toFixed(0);
+  if (v == null || isNaN(v)) return '—';
+  if (metric === 'eps_diluted' || metric === 'eps_basic') return (v >= 0 ? '+' : '') + v.toFixed(2);
+  const s = v < 0 ? '-' : '', a = Math.abs(v);
+  if (a >= 1e9) return s + (a / 1e9).toFixed(2) + 'B';
+  if (a >= 1e6) return s + (a / 1e6).toFixed(2) + 'M';
+  if (a >= 1e3) return s + (a / 1e3).toFixed(2) + 'K';
+  return s + a.toFixed(2);
 }
-function pctStr(a,b) { return (!b||!a)?'—':((a/b)*100).toFixed(2)+'%'; }
+
+function pctStr(a, b) {
+  if (!b || a == null || isNaN(a)) return '—';
+  return ((a / b) * 100).toFixed(1) + '%';
+}
 
 async function fetchCSV(p) {
   try { return d3.csvParse(await (await fetch(p)).text()); } catch { return []; }
@@ -286,270 +306,495 @@ async function init() {
   const meta = await fetchJSON('data/meta.json');
   S.tickers = meta.tickers || ['U'];
   document.getElementById('meta-info').innerHTML =
-    `数据更新: ${(meta.updated_at||'').slice(0,10)||'—'}<br>单位: 美元`;
+    `Updated: ${(meta.updated_at || '').slice(0, 10) || '—'}<br>Currency: USD`;
 
   const tabs = document.getElementById('ticker-tabs');
   S.tickers.forEach(t => {
-    const b=document.createElement('button');
-    b.className='ticker-btn'; b.textContent='$'+t; b.id='tab-'+t;
-    b.onclick=()=>selectTicker(t); tabs.appendChild(b);
+    const b = document.createElement('button');
+    b.className = 'ticker-btn'; b.textContent = '$' + t; b.id = 'tab-' + t;
+    b.onclick = () => selectTicker(t);
+    tabs.appendChild(b);
   });
 
-  [S._sankeyAll, S._trendAll, S._estAll] = await Promise.all([
-    fetchCSV('data/sankey.csv'), fetchCSV('data/trend.csv'), fetchCSV('data/estimates.csv')
+  [S._sankeyAll, S._trendAll, S._estAll, S._balAll, S._cfAll] = await Promise.all([
+    fetchCSV('data/sankey.csv'), fetchCSV('data/trend.csv'), fetchCSV('data/estimates.csv'),
+    fetchCSV('data/balance.csv'), fetchCSV('data/cashflow.csv'),
   ]);
 
-  const ftabs = document.getElementById('forecast-tabs');
-  Object.entries(METRIC_LABELS).forEach(([k,label]) => {
-    const b=document.createElement('button');
-    b.className='metric-tab'+(k===S.forecastMetric?' active':'');
-    b.textContent=label; b.dataset.metric=k;
-    b.onclick=()=>{
-      S.forecastMetric=k;
-      ftabs.querySelectorAll('.metric-tab').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active'); renderForecast();
+  const ttabs = document.getElementById('trend-tabs');
+  Object.entries(TREND_LABELS).forEach(([k, label]) => {
+    const b = document.createElement('button');
+    b.className = 'metric-tab' + (k === S.trendMetric ? ' active' : '');
+    b.textContent = label; b.dataset.metric = k;
+    b.onclick = () => {
+      S.trendMetric = k;
+      ttabs.querySelectorAll('.metric-tab').forEach(x => x.classList.remove('active'));
+      b.classList.add('active'); renderTrend();
     };
-    ftabs.appendChild(b);
+    ttabs.appendChild(b);
   });
 
   await selectTicker(S.tickers[0]);
 }
 
 async function selectTicker(t) {
-  S.ticker=t;
-  document.querySelectorAll('.ticker-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+t)?.classList.add('active');
-  S.sankey[t]=S._sankeyAll.filter(r=>r.ticker===t);
-  S.trend[t] =S._trendAll.filter(r=>r.ticker===t);
-  S.est[t]   =S._estAll.filter(r=>r.ticker===t);
-  S.sankeyIdx=getSankeyDates().length-1;
-  renderSankey(); renderForecast();
+  S.ticker = t;
+  document.querySelectorAll('.ticker-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + t)?.classList.add('active');
+  S.sankey[t] = S._sankeyAll.filter(r => r.ticker === t);
+  S.trend[t]  = S._trendAll.filter(r => r.ticker === t);
+  S.est[t]    = S._estAll.filter(r => r.ticker === t);
+  S.bal[t]    = S._balAll.filter(r => r.ticker === t);
+  S.cf[t]     = S._cfAll.filter(r => r.ticker === t);
+  S.sankeyIdx = getSankeyDates().length - 1;
+  S.finIdx    = getFinDates().length - 1;
+  renderSankey(); renderTrend(); renderFin();
 }
 
 function setPeriod(p) {
-  S.period=p;
-  document.getElementById('btn-q').classList.toggle('active',p==='quarterly');
-  document.getElementById('btn-a').classList.toggle('active',p==='annual');
-  S.sankeyIdx=getSankeyDates().length-1;
-  renderSankey(); renderForecast();
+  S.period = p;
+  document.getElementById('btn-q').classList.toggle('active', p === 'quarterly');
+  document.getElementById('btn-a').classList.toggle('active', p === 'annual');
+  S.sankeyIdx = getSankeyDates().length - 1;
+  S.finIdx    = getFinDates().length - 1;
+  renderSankey(); renderTrend(); renderFin();
 }
 
+// ── Sankey ────────────────────────────────────────────────────────────────────
+
 function getSankeyDates() {
-  return [...new Set((S.sankey[S.ticker]||[])
-    .filter(r=>r.period_type===S.period).map(r=>r.date))].sort();
+  return [...new Set((S.sankey[S.ticker] || [])
+    .filter(r => r.period_type === S.period).map(r => r.date))].sort();
 }
 
 function shiftSankey(d) {
-  const dates=getSankeyDates();
-  S.sankeyIdx=Math.max(0,Math.min(dates.length-1, S.sankeyIdx+d));
+  const dates = getSankeyDates();
+  S.sankeyIdx = Math.max(0, Math.min(dates.length - 1, S.sankeyIdx + d));
   renderSankey();
 }
 
 function renderSankey() {
-  const dates=getSankeyDates(), date=dates[S.sankeyIdx];
-  document.getElementById('sankey-label').textContent=date||'—';
-  document.getElementById('nav-prev').style.opacity=S.sankeyIdx>0?1:0.3;
-  document.getElementById('nav-next').style.opacity=S.sankeyIdx<dates.length-1?1:0.3;
+  const dates = getSankeyDates(), date = dates[S.sankeyIdx];
+  document.getElementById('sankey-label').textContent = date || '—';
+  document.getElementById('nav-prev').style.opacity = S.sankeyIdx > 0 ? 1 : 0.3;
+  document.getElementById('nav-next').style.opacity = S.sankeyIdx < dates.length - 1 ? 1 : 0.3;
 
-  const rows=(S.sankey[S.ticker]||[]).filter(r=>r.period_type===S.period&&r.date===date);
-  const svg=d3.select('#sankey-svg');
+  const rows = (S.sankey[S.ticker] || []).filter(r => r.period_type === S.period && r.date === date);
+  const svg = d3.select('#sankey-svg');
   svg.selectAll('*').remove();
   if (!rows.length) return;
 
-  const r=rows[0];
-  const g=k=>parseFloat(r[k])||0;
+  const r = rows[0];
+  const g = k => parseFloat(r[k]) || 0;
 
-  const totalRev = g('total_revenue');
-  const cogs     = g('cost_of_revenue');
-  const grossP   = g('gross_profit');
-  const rdExp    = g('rd_expense');
-  const sgaExp   = g('sga_expense');
-  const opInc    = g('operating_income');
-  const tax      = Math.abs(g('tax_provision'));
-  const netInc   = g('net_income');
+  const totalRev  = g('total_revenue');
+  const cogs      = g('cost_of_revenue');
+  const grossP    = g('gross_profit');
+  const rdExp     = g('rd_expense');
+  const sgaExp    = g('sga_expense');
+  const opInc     = g('operating_income');
+  const interest  = Math.abs(g('interest_expense'));
+  const tax       = Math.abs(g('tax_provision'));
+  const netInc    = g('net_income');
 
-  const body=document.getElementById('card-sankey');
-  const W=Math.max(body.clientWidth-32, 600); 
-  const H=Math.max(340, Math.round(W*0.38));
-  svg.attr('viewBox',`0 0 ${W} ${H}`).attr('height',H).style('width', W + 'px');
+  if (totalRev <= 0) return;
 
-  const MIN=1e5;
+  const body = document.getElementById('card-sankey');
+  const W = Math.max(body.clientWidth - 32, 600);
+  const H = Math.max(340, Math.round(W * 0.38));
+  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H).style('width', W + 'px');
 
-  const nodeList=[
-    {id:0,name:'营业收入',    color:C.revenue},
-    {id:1,name:'销售成本',    color:C.cogs},
-    {id:2,name:'毛利',        color:C.gross},
-    {id:3,name:'研发费用',    color:C.rd},
-    {id:4,name:'销售及行政',  color:C.sga},
-    {id:5,name:'营业利润',    color:C.opInc},
-    {id:6,name:'营业亏损',    color:C.opLoss},
-    {id:7,name:'所得税',      color:C.tax},
-    {id:8,name:'净利润',      color:C.netInc},
-    {id:9,name:'净亏损',      color:C.netLoss},
+  const MIN = 1;
+
+  /*
+   * Acyclic Sankey DAG — one correct model for all profit/loss scenarios:
+   *
+   * Layer 0 (source): Revenue
+   * Layer 1: COGS, Gross Profit
+   * Layer 2 (from Gross Profit): R&D, SG&A, [Op Income | Op Loss]
+   *   — Gross Profit is split proportionally across all L2 targets.
+   *   — When opInc < 0: "Op Loss" receives the excess opex beyond grossP.
+   *     We model this by adding an "Op Loss" node that receives (|opInc|) from
+   *     Gross Profit. The R&D and SG&A bars show their full values but the
+   *     Gross Profit outflow sums correctly because the sankey library normalises
+   *     link widths relative to node values.
+   *   — Concretely: grossP always splits across its children s.t. they sum to grossP.
+   *     When opInc >= 0: rdExp + sgaExp + opInc = grossP (accounting identity).
+   *     When opInc < 0:  rdExp + sgaExp = grossP + |opInc|, so we route:
+   *       grossP → RD  (rdFrac  * grossP)
+   *       grossP → SGA (sgaFrac * grossP)
+   *       grossP → OpLoss (remaining = |opInc|)  [but we show it flowing INTO OpLoss]
+   *     This keeps the DAG acyclic and numbers balanced.
+   * Layer 3 (from Op Income, when profitable): Interest, Tax, [Net Income | Net Loss]
+   */
+
+  // IDs
+  const ID = { rev:0, cogs:1, gross:2, rd:3, sga:4, opInc:5, opLoss:6, interest:7, tax:8, netInc:9, netLoss:10 };
+
+  const nodeList = [
+    { id: ID.rev,      name: 'Revenue',       color: C.revenue  },
+    { id: ID.cogs,     name: 'COGS',           color: C.cogs     },
+    { id: ID.gross,    name: 'Gross Profit',   color: C.gross    },
+    { id: ID.rd,       name: 'R&D',            color: C.rd       },
+    { id: ID.sga,      name: 'SG&A',           color: C.sga      },
+    { id: ID.opInc,    name: 'Op. Income',     color: C.opInc    },
+    { id: ID.opLoss,   name: 'Op. Loss',       color: C.opLoss   },
+    { id: ID.interest, name: 'Interest',       color: C.interest },
+    { id: ID.tax,      name: 'Tax',            color: C.tax      },
+    { id: ID.netInc,   name: 'Net Income',     color: C.netInc   },
+    { id: ID.netLoss,  name: 'Net Loss',       color: C.netLoss  },
   ];
 
-  const links=[];
+  const links = [];
 
-  // Layer 1
-  if (totalRev > 0) {
-    links.push({source: 0, target: 1, value: Math.max(cogs, MIN)});
-    links.push({source: 0, target: 2, value: Math.max(grossP, MIN)});
-  }
+  // Layer 0 → 1: Revenue splits into COGS and Gross Profit
+  // Accounting identity: totalRev = cogs + grossP (use actual values)
+  const cogsVal  = Math.max(cogs, MIN);
+  const grossVal = Math.max(grossP, MIN);
+  links.push({ source: ID.rev, target: ID.cogs,  value: cogsVal  });
+  links.push({ source: ID.rev, target: ID.gross, value: grossVal });
 
-  // Layer 2 & 3: Operating Logic
+  // Layer 1 → 2: Gross Profit splits across operating items
   if (opInc >= 0) {
-    // 盈利模式：毛利流向费用，剩余流向营业利润
-    links.push({source: 2, target: 3, value: Math.max(rdExp, MIN)});
-    links.push({source: 2, target: 4, value: Math.max(sgaExp, MIN)});
-    links.push({source: 2, target: 5, value: Math.max(opInc, MIN)});
+    // Profitable at operating level: grossP = rdExp + sgaExp + opInc
+    if (rdExp  > 0) links.push({ source: ID.gross, target: ID.rd,    value: Math.max(rdExp,  MIN) });
+    if (sgaExp > 0) links.push({ source: ID.gross, target: ID.sga,   value: Math.max(sgaExp, MIN) });
+    links.push(        { source: ID.gross, target: ID.opInc, value: Math.max(opInc,  MIN) });
+
+    // Layer 2 → 3: Op Income splits into interest, tax, and net result
+    // opInc flows out: interest + tax + netInc = opInc (approximately; differences absorbed)
+    if (interest > 0) links.push({ source: ID.opInc, target: ID.interest, value: Math.max(interest, MIN) });
+    if (tax      > 0) links.push({ source: ID.opInc, target: ID.tax,      value: Math.max(tax,      MIN) });
+    if (netInc >= 0)  links.push({ source: ID.opInc, target: ID.netInc,   value: Math.max(netInc,   MIN) });
+    else              links.push({ source: ID.opInc, target: ID.netLoss,   value: Math.max(-netInc,  MIN) });
   } else {
-    // 亏损模式：毛利和亏损共同支撑费用
+    // Operating loss: opex exceeds gross profit
+    // grossP is proportionally allocated to R&D and SG&A; the residual deficit
+    // is shown as Op. Loss flowing out of Gross Profit.
     const totalOpex = rdExp + sgaExp;
-    const grossAlloc = grossP / (totalOpex || 1);
-    
-    // 毛利流向费用
-    links.push({source: 2, target: 3, value: Math.max(rdExp * grossAlloc, MIN)});
-    links.push({source: 2, target: 4, value: Math.max(sgaExp * grossAlloc, MIN)});
-    
-    // 缺口由亏损节点补齐，且亏损节点置于右侧
-    links.push({source: 3, target: 6, value: Math.max(rdExp - (rdExp * grossAlloc), MIN)});
-    links.push({source: 4, target: 6, value: Math.max(sgaExp - (sgaExp * grossAlloc), MIN)});
-  }
-
-  if (opInc > 0) {
-    links.push({source: 5, target: 7, value: Math.max(tax, MIN)});
-    if (netInc >= 0) {
-      links.push({source: 5, target: 8, value: Math.max(netInc, MIN)});
-    } else {
-      links.push({source: 5, target: 9, value: Math.max(Math.abs(netInc), MIN)});
+    if (totalOpex > 0) {
+      const rdAlloc  = (rdExp  / totalOpex) * grossVal;
+      const sgaAlloc = (sgaExp / totalOpex) * grossVal;
+      if (rdExp  > 0) links.push({ source: ID.gross, target: ID.rd,     value: Math.max(rdAlloc,  MIN) });
+      if (sgaExp > 0) links.push({ source: ID.gross, target: ID.sga,    value: Math.max(sgaAlloc, MIN) });
     }
+    // Operating loss = |opInc|, shown as a terminal sink from Gross Profit
+    links.push({ source: ID.gross, target: ID.opLoss, value: Math.max(-opInc, MIN) });
   }
 
-  const usedIds=new Set(links.flatMap(l=>[l.source,l.target]));
-  const nodes=nodeList.filter(n=>usedIds.has(n.id)).map(d=>({...d}));
+  const usedIds = new Set(links.flatMap(l => [l.source, l.target]));
+  const nodes   = nodeList.filter(n => usedIds.has(n.id)).map(d => ({ ...d }));
 
-  const sankey=d3.sankey()
-    .nodeId(d=>d.id).nodeWidth(18).nodePadding(20)
-    .extent([[0,8],[W-170,H-8]]);
+  const sankey = d3.sankey()
+    .nodeId(d => d.id).nodeWidth(18).nodePadding(20)
+    .extent([[0, 8], [W - 180, H - 8]]);
 
   let graph;
-  try { graph=sankey({nodes,links:links.map(l=>({...l}))}); }
-  catch(e){ return; }
+  try { graph = sankey({ nodes, links: links.map(l => ({ ...l })) }); }
+  catch (e) { return; }
 
-  const grp=svg.append('g');
+  const grp = svg.append('g');
 
   grp.selectAll('.sk-link')
     .data(graph.links).join('path')
     .attr('d', d3.sankeyLinkHorizontal())
-    .attr('fill','none').attr('stroke', d => d.target.color)
-    .attr('stroke-width', d=>Math.max(1,d.width)).attr('stroke-opacity', 0.18)
-    .on('mousemove', (e,d)=>{
+    .attr('fill', 'none')
+    .attr('stroke', d => d.target.color)
+    .attr('stroke-width', d => Math.max(1, d.width))
+    .attr('stroke-opacity', 0.2)
+    .on('mousemove', (e, d) => {
       showTip(`<div class="tip-title">${d.source.name} → ${d.target.name}</div>
-        <div class="tip-row"><span class="tip-key">金额</span><span class="tip-val">${fmt(d.value,'total_revenue')}</span></div>`,e);
+        <div class="tip-row"><span class="tip-key">Amount</span><span class="tip-val">${fmt(d.value, 'total_revenue')}</span></div>`, e);
     }).on('mouseleave', hideTip);
 
   grp.selectAll('.sk-node')
     .data(graph.nodes).join('rect')
-    .attr('x',d=>d.x0).attr('y',d=>d.y0)
-    .attr('width',d=>d.x1-d.x0).attr('height',d=>Math.max(2,d.y1-d.y0))
-    .attr('fill',d=>d.color).attr('rx',2)
-    .on('mousemove',(e,d)=>{
+    .attr('x', d => d.x0).attr('y', d => d.y0)
+    .attr('width', d => d.x1 - d.x0).attr('height', d => Math.max(2, d.y1 - d.y0))
+    .attr('fill', d => d.color).attr('rx', 2)
+    .on('mousemove', (e, d) => {
       showTip(`<div class="tip-title">${d.name}</div>
-        <div class="tip-row"><span class="tip-key">金额</span><span class="tip-val">${fmt(d.value||0,'total_revenue')}</span></div>`,e);
-    }).on('mouseleave',hideTip);
+        <div class="tip-row"><span class="tip-key">Amount</span><span class="tip-val">${fmt(d.value || 0, 'total_revenue')}</span></div>`, e);
+    }).on('mouseleave', hideTip);
 
   grp.selectAll('.sk-name')
     .data(graph.nodes).join('text')
-    .attr('x', d=>d.x1+8).attr('y', d=>(d.y0+d.y1)/2-8).attr('dy','0.35em')
-    .attr('font-family',"'Share Tech Mono',monospace").attr('font-size', 13)
-    .attr('font-weight','600').attr('fill', d=>d.color).text(d=>d.name);
+    .attr('x', d => d.x1 + 8).attr('y', d => (d.y0 + d.y1) / 2 - 8).attr('dy', '0.35em')
+    .attr('font-family', "'Share Tech Mono',monospace").attr('font-size', 13)
+    .attr('font-weight', '600').attr('fill', d => d.color).text(d => d.name);
 
   grp.selectAll('.sk-val')
     .data(graph.nodes).join('text')
-    .attr('x', d=>d.x1+8).attr('y', d=>(d.y0+d.y1)/2+10).attr('dy','0.35em')
-    .attr('font-family',"'Share Tech Mono',monospace").attr('font-size', 14)
-    .attr('fill','#e8eaf0').text(d=>fmt(d.value||0,'total_revenue'));
+    .attr('x', d => d.x1 + 8).attr('y', d => (d.y0 + d.y1) / 2 + 10).attr('dy', '0.35em')
+    .attr('font-family', "'Share Tech Mono',monospace").attr('font-size', 14)
+    .attr('fill', '#e8eaf0').text(d => fmt(d.value || 0, 'total_revenue'));
 
-  ['毛利','营业利润','营业亏损','净利润','净亏损'].forEach(name=>{
-    const nd=graph.nodes.find(n=>n.name===name);
+  // Margin % annotations on key profit nodes
+  const annotate = [
+    { name: 'Gross Profit', val: grossP },
+    { name: 'Op. Income',   val: opInc  },
+    { name: 'Op. Loss',     val: opInc  },
+    { name: 'Net Income',   val: netInc },
+    { name: 'Net Loss',     val: netInc },
+  ];
+  annotate.forEach(({ name, val }) => {
+    const nd = graph.nodes.find(n => n.name === name);
     if (!nd) return;
-    const val = (name.includes('利润')) ? (name==='毛利'?grossP:(name==='营业利润'?opInc:netInc)) : -Math.abs(g(name==='营业亏损'?'operating_income':'net_income'));
-    grp.append('text').attr('x',nd.x1+8).attr('y',nd.y0-5)
-      .attr('font-family',"'Press Start 2P',monospace").attr('font-size',9)
-      .attr('fill',nd.color).text(pctStr(val,totalRev));
+    grp.append('text')
+      .attr('x', nd.x1 + 8).attr('y', nd.y0 - 5)
+      .attr('font-family', "'Press Start 2P',monospace").attr('font-size', 9)
+      .attr('fill', nd.color).text(pctStr(val, totalRev));
   });
 }
 
-function renderForecast() {
-  const metric=S.forecastMetric;
-  const isEPS=metric==='eps_diluted';
-  const actual=(S.trend[S.ticker]||[])
-    .filter(r=>r.period_type===S.period&&r.metric===metric)
-    .map(r=>({date:new Date(r.date),value:+r.value})).sort((a,b)=>a.date-b.date);
+// ── Trend Chart ───────────────────────────────────────────────────────────────
 
-  const estMap={};
-  (S.est[S.ticker]||[]).filter(r=>r.period_type===S.period&&r.metric===metric)
-    .forEach(r=>{ estMap[r.date]=+r.estimate; });
+function renderTrend() {
+  const metric = S.trendMetric;
+  const isEPS  = metric === 'eps_diluted';
+  const actual = (S.trend[S.ticker] || [])
+    .filter(r => r.period_type === S.period && r.metric === metric)
+    .map(r => ({ date: new Date(r.date), value: +r.value }))
+    .sort((a, b) => a.date - b.date);
 
-  const estPts=actual.map(d=>({ date:d.date, estimate:estMap[d3.timeFormat('%Y-%m-%d')(d.date)] }))
-    .filter(d=>d.estimate!=null);
+  const estMap = {};
+  (S.est[S.ticker] || []).filter(r => r.period_type === S.period && r.metric === metric)
+    .forEach(r => { estMap[r.date] = +r.estimate; });
 
-  const svg=d3.select('#forecast-svg');
+  const estPts = actual.map(d => ({
+    date: d.date,
+    estimate: estMap[d3.timeFormat('%Y-%m-%d')(d.date)]
+  })).filter(d => d.estimate != null);
+
+  const svg = d3.select('#trend-svg');
   svg.selectAll('*').remove();
   if (!actual.length) return;
 
-  const body=document.getElementById('card-sankey'); 
-  const W=Math.max(body.clientWidth-32, 500); 
-  const H=260;
-  const M={top:30,right:20,bottom:44,left:isEPS?56:80};
-  const iW=W-M.left-M.right, iH=H-M.top-M.bottom;
+  const body = document.getElementById('card-sankey');
+  const W = Math.max(body.clientWidth - 32, 500);
+  const H = 260;
+  const M = { top: 30, right: 20, bottom: 44, left: isEPS ? 56 : 80 };
+  const iW = W - M.left - M.right, iH = H - M.top - M.bottom;
 
-  svg.attr('viewBox',`0 0 ${W} ${H}`).attr('height',H).style('width', W + 'px');
-  const g=svg.append('g').attr('transform',`translate(${M.left},${M.top})`);
+  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H).style('width', W + 'px');
+  const g = svg.append('g').attr('transform', `translate(${M.left},${M.top})`);
 
-  const allVals=[...actual.map(d=>d.value),...estPts.map(d=>d.estimate)];
-  const x=d3.scalePoint().domain(actual.map(d=>d.date)).range([0,iW]).padding(0.3);
-  const yExt=d3.extent(allVals);
-  const pad=(yExt[1]-yExt[0])*0.18||Math.abs(yExt[0])*0.15||1;
-  const y=d3.scaleLinear().domain([yExt[0]-pad,yExt[1]+pad]).range([iH,0]).nice();
+  const allVals = [...actual.map(d => d.value), ...estPts.map(d => d.estimate)];
+  const x = d3.scalePoint().domain(actual.map(d => d.date)).range([0, iW]).padding(0.3);
+  const yExt = d3.extent(allVals);
+  const pad = (yExt[1] - yExt[0]) * 0.18 || Math.abs(yExt[0]) * 0.15 || 1;
+  const y = d3.scaleLinear().domain([yExt[0] - pad, yExt[1] + pad]).range([iH, 0]).nice();
 
-  if (yExt[0]<0&&yExt[1]>0) {
-    g.append('line').attr('x1',0).attr('x2',iW).attr('y1',y(0)).attr('y2',y(0))
-      .attr('stroke',`rgba(255,255,255,0.12)`).attr('stroke-width',1).attr('stroke-dasharray','4 3');
+  if (yExt[0] < 0 && yExt[1] > 0) {
+    g.append('line').attr('x1', 0).attr('x2', iW).attr('y1', y(0)).attr('y2', y(0))
+      .attr('stroke', 'rgba(255,255,255,0.12)').attr('stroke-width', 1).attr('stroke-dasharray', '4 3');
   }
 
-  g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(v=>fmt(v,metric)).tickSize(-iW))
-    .call(g2=>{ g2.select('.domain').remove(); g2.selectAll('.tick line').attr('stroke',`rgba(255,255,255,0.06)`);
-      g2.selectAll('.tick text').attr('font-family',"'Share Tech Mono',monospace").attr('font-size',11).attr('fill','#5a6280');
+  g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(v => fmt(v, metric)).tickSize(-iW))
+    .call(g2 => {
+      g2.select('.domain').remove();
+      g2.selectAll('.tick line').attr('stroke', 'rgba(255,255,255,0.06)');
+      g2.selectAll('.tick text').attr('font-family', "'Share Tech Mono',monospace").attr('font-size', 11).attr('fill', '#5a6280');
     });
 
-  const timeFmt=S.period==='quarterly'?d=>{const q=Math.ceil((d.getMonth()+1)/3);return `${d.getFullYear()}/${q>1?'Q'+q:'Q1'}`;} :d=>String(d.getFullYear());
+  const timeFmt = S.period === 'quarterly'
+    ? d => { const q = Math.ceil((d.getMonth() + 1) / 3); return `${d.getFullYear()}/Q${q}`; }
+    : d => String(d.getFullYear());
 
-  g.append('g').attr('transform',`translate(0,${iH})`).call(d3.axisBottom(x).tickFormat(timeFmt))
-    .call(g2=>{ g2.select('.domain').attr('stroke','rgba(255,255,255,0.1)'); g2.selectAll('.tick line').attr('stroke','rgba(255,255,255,0.1)');
-      g2.selectAll('.tick text').attr('font-family',"'Share Tech Mono',monospace").attr('font-size',11).attr('fill','#5a6280').attr('dy','1.3em');
+  g.append('g').attr('transform', `translate(0,${iH})`)
+    .call(d3.axisBottom(x).tickFormat(timeFmt))
+    .call(g2 => {
+      g2.select('.domain').attr('stroke', 'rgba(255,255,255,0.1)');
+      g2.selectAll('.tick line').attr('stroke', 'rgba(255,255,255,0.1)');
+      g2.selectAll('.tick text').attr('font-family', "'Share Tech Mono',monospace").attr('font-size', 11).attr('fill', '#5a6280').attr('dy', '1.3em');
     });
 
-  if (estPts.length>1) {
-    g.append('path').datum(estPts).attr('fill','none').attr('stroke','var(--blue)').attr('stroke-width',2).attr('stroke-dasharray','6 4')
-      .attr('d',d3.line().x(d=>x(d.date)).y(d=>y(d.estimate)).curve(d3.curveMonotoneX));
+  if (estPts.length > 1) {
+    g.append('path').datum(estPts)
+      .attr('fill', 'none').attr('stroke', 'var(--blue)').attr('stroke-width', 2).attr('stroke-dasharray', '6 4')
+      .attr('d', d3.line().x(d => x(d.date)).y(d => y(d.estimate)).curve(d3.curveMonotoneX));
   }
 
-  g.append('path').datum(actual).attr('fill','none').attr('stroke','var(--orange)').attr('stroke-width',2.5)
-    .attr('d',d3.line().x(d=>x(d.date)).y(d=>y(d.value)).curve(d3.curveMonotoneX));
+  g.append('path').datum(actual)
+    .attr('fill', 'none').attr('stroke', 'var(--orange)').attr('stroke-width', 2.5)
+    .attr('d', d3.line().x(d => x(d.date)).y(d => y(d.value)).curve(d3.curveMonotoneX));
 
-  g.selectAll('.act-dot').data(actual).join('circle').attr('cx',d=>x(d.date)).attr('cy',d=>y(d.value)).attr('r',5).attr('fill','var(--orange)')
-    .attr('stroke','var(--bg2)').attr('stroke-width',2)
-    .on('mousemove',(e,d)=>{
-      const ds=d3.timeFormat('%Y-%m-%d')(d.date); const est=estMap[ds]; const diff=est!=null?d.value-est:null; const beat=diff!=null&&diff>=0;
+  g.selectAll('.act-dot').data(actual).join('circle')
+    .attr('cx', d => x(d.date)).attr('cy', d => y(d.value))
+    .attr('r', 5).attr('fill', 'var(--orange)').attr('stroke', 'var(--bg2)').attr('stroke-width', 2)
+    .on('mousemove', (e, d) => {
+      const ds = d3.timeFormat('%Y-%m-%d')(d.date);
+      const est = estMap[ds];
+      const diff = est != null ? d.value - est : null;
+      const beat = diff != null && diff >= 0;
       showTip(`<div class="tip-title">${timeFmt(d.date)}</div>
-        <div class="tip-row"><span class="tip-key">实际</span><span class="tip-val">${fmt(d.value,metric)}</span></div>
-        ${est!=null?`<div class="tip-row"><span class="tip-key">预估</span><span class="tip-val">${fmt(est,metric)}</span></div>
-        <div class="tip-row"><span class="tip-key">差值</span><span class="${beat?'tip-beat':'tip-miss'}">${beat?'+':''}${fmt(diff,metric)}</span></div>`:''}`,e);
-    }).on('mouseleave',hideTip);
+        <div class="tip-row"><span class="tip-key">Actual</span><span class="tip-val">${fmt(d.value, metric)}</span></div>
+        ${est != null ? `<div class="tip-row"><span class="tip-key">Est.</span><span class="tip-val">${fmt(est, metric)}</span></div>
+        <div class="tip-row"><span class="tip-key">Diff</span><span class="${beat ? 'tip-beat' : 'tip-miss'}">${beat ? '+' : ''}${fmt(diff, metric)}</span></div>` : ''}`, e);
+    }).on('mouseleave', hideTip);
 }
 
-window.addEventListener('resize', ()=>{ if (S.ticker) { renderSankey(); renderForecast(); } });
+// ── Financial Snapshot (Balance Sheet + Cash Flow) ────────────────────────────
+
+function getFinDates() {
+  const balDates = [...new Set((S.bal[S.ticker] || [])
+    .filter(r => r.period_type === S.period).map(r => r.date))];
+  const cfDates  = [...new Set((S.cf[S.ticker]  || [])
+    .filter(r => r.period_type === S.period).map(r => r.date))];
+  return [...new Set([...balDates, ...cfDates])].sort();
+}
+
+function shiftFin(d) {
+  const dates = getFinDates();
+  S.finIdx = Math.max(0, Math.min(dates.length - 1, S.finIdx + d));
+  renderFin();
+}
+
+function renderFin() {
+  const dates = getFinDates(), date = dates[S.finIdx];
+  document.getElementById('fin-label').textContent = date || '—';
+  document.getElementById('fin-prev').style.opacity = S.finIdx > 0 ? 1 : 0.3;
+  document.getElementById('fin-next').style.opacity = S.finIdx < dates.length - 1 ? 1 : 0.3;
+
+  const body = document.getElementById('fin-body');
+  body.innerHTML = '';
+  if (!date) return;
+
+  const balRow = (S.bal[S.ticker] || []).find(r => r.period_type === S.period && r.date === date) || {};
+  const cfRow  = (S.cf[S.ticker]  || []).find(r => r.period_type === S.period && r.date === date) || {};
+  const incRow = (S.sankey[S.ticker] || []).find(r => r.period_type === S.period && r.date === date) || {};
+
+  const n = k => { const v = parseFloat(k); return isNaN(v) ? null : v; };
+
+  // Computed ratios
+  const totalAssets   = n(balRow.total_assets);
+  const totalLiab     = n(balRow.total_liabilities);
+  const equity        = n(balRow.stockholders_equity) || n(balRow.common_equity);
+  const cash          = n(balRow.cash);
+  const totalDebt     = n(balRow.total_debt);
+  const netDebt       = n(balRow.net_debt);
+  const curAssets     = n(balRow.current_assets);
+  const curLiab       = n(balRow.current_liabilities);
+  const inventory     = n(balRow.inventory);
+  const ar            = n(balRow.accounts_receivable);
+  const goodwill      = n(balRow.goodwill_intangibles);
+  const retainedEarn  = n(balRow.retained_earnings);
+
+  const opCF          = n(cfRow.operating_cf);
+  const capex         = n(cfRow.capex);
+  const fcf           = n(cfRow.free_cash_flow);
+  const invCF         = n(cfRow.investing_cf);
+  const finCF         = n(cfRow.financing_cf);
+  const debtIssue     = n(cfRow.debt_issuance);
+  const debtRepay     = n(cfRow.debt_repayment);
+  const stockIssue    = n(cfRow.stock_issuance);
+  const stockRepurch  = n(cfRow.stock_repurchase);
+
+  const ebitda        = n(incRow.ebitda);
+  const totalRev      = n(incRow.total_revenue);
+  const grossP        = n(incRow.gross_profit);
+  const opInc         = n(incRow.operating_income);
+  const netInc        = n(incRow.net_income);
+
+  // Derived
+  const currentRatio  = (curAssets != null && curLiab) ? curAssets / curLiab : null;
+  const quickRatio    = (curAssets != null && inventory != null && curLiab) ? (curAssets - inventory) / curLiab : null;
+  const debtToEquity  = (totalDebt != null && equity) ? totalDebt / equity : null;
+  const netDebtEbitda = (netDebt != null && ebitda) ? netDebt / ebitda : null;
+  const roa           = (netInc != null && totalAssets) ? netInc / totalAssets : null;
+  const roe           = (netInc != null && equity) ? netInc / equity : null;
+  const grossMargin   = (grossP != null && totalRev) ? grossP / totalRev : null;
+  const opMargin      = (opInc  != null && totalRev) ? opInc  / totalRev : null;
+  const netMargin     = (netInc != null && totalRev) ? netInc / totalRev : null;
+  const fcfConversion = (fcf    != null && opCF && opCF !== 0) ? fcf / opCF : null;
+  const fcfMargin     = (fcf    != null && totalRev) ? fcf / totalRev : null;
+
+  function pct(v) { if (v == null) return '—'; return (v * 100).toFixed(1) + '%'; }
+  function ratio(v, dec) { if (v == null) return '—'; return v.toFixed(dec ?? 2) + 'x'; }
+  function fmtv(v) { return fmt(v, 'total_revenue'); }
+  function colorClass(v, goodIfPos) {
+    if (v == null) return '';
+    return (v >= 0) === goodIfPos ? 'pos' : 'neg';
+  }
+
+  const sections = [
+    {
+      title: 'BALANCE SHEET',
+      items: [
+        { label: 'Total Assets',          val: fmtv(totalAssets),  cls: '' },
+        { label: 'Total Liabilities',     val: fmtv(totalLiab),    cls: '' },
+        { label: 'Stockholders Equity',   val: fmtv(equity),       cls: colorClass(equity, true) },
+        { label: 'Cash & Equivalents',    val: fmtv(cash),         cls: 'pos' },
+        { label: 'Total Debt',            val: fmtv(totalDebt),    cls: colorClass(totalDebt, false) },
+        { label: 'Net Debt',              val: fmtv(netDebt),      cls: colorClass(netDebt, false) },
+        { label: 'Current Assets',        val: fmtv(curAssets),    cls: '' },
+        { label: 'Current Liabilities',   val: fmtv(curLiab),      cls: '' },
+        { label: 'Inventory',             val: fmtv(inventory),    cls: '' },
+        { label: 'Accounts Receivable',   val: fmtv(ar),           cls: '' },
+        { label: 'Goodwill & Intangibles',val: fmtv(goodwill),     cls: '' },
+        { label: 'Retained Earnings',     val: fmtv(retainedEarn), cls: colorClass(retainedEarn, true) },
+      ]
+    },
+    {
+      title: 'LIQUIDITY & LEVERAGE',
+      items: [
+        { label: 'Current Ratio',         val: ratio(currentRatio),  cls: currentRatio != null ? (currentRatio >= 1.5 ? 'pos' : currentRatio >= 1 ? '' : 'neg') : '' },
+        { label: 'Quick Ratio',           val: ratio(quickRatio),    cls: quickRatio   != null ? (quickRatio   >= 1   ? 'pos' : 'neg') : '' },
+        { label: 'Debt / Equity',         val: ratio(debtToEquity),  cls: debtToEquity != null ? (debtToEquity <= 1 ? 'pos' : debtToEquity <= 2 ? '' : 'neg') : '' },
+        { label: 'Net Debt / EBITDA',     val: ratio(netDebtEbitda), cls: netDebtEbitda != null ? (netDebtEbitda <= 2 ? 'pos' : netDebtEbitda <= 4 ? '' : 'neg') : '' },
+      ]
+    },
+    {
+      title: 'PROFITABILITY',
+      items: [
+        { label: 'Gross Margin',          val: pct(grossMargin), cls: colorClass(grossMargin, true) },
+        { label: 'Operating Margin',      val: pct(opMargin),    cls: colorClass(opMargin, true) },
+        { label: 'Net Margin',            val: pct(netMargin),   cls: colorClass(netMargin, true) },
+        { label: 'Return on Assets',      val: pct(roa),         cls: colorClass(roa, true) },
+        { label: 'Return on Equity',      val: pct(roe),         cls: colorClass(roe, true) },
+      ]
+    },
+    {
+      title: 'CASH FLOW',
+      items: [
+        { label: 'Operating Cash Flow',   val: fmtv(opCF),       cls: colorClass(opCF, true) },
+        { label: 'Capital Expenditure',   val: fmtv(capex),      cls: '' },
+        { label: 'Free Cash Flow',        val: fmtv(fcf),        cls: colorClass(fcf, true) },
+        { label: 'FCF Margin',            val: pct(fcfMargin),   cls: colorClass(fcfMargin, true) },
+        { label: 'FCF Conversion',        val: pct(fcfConversion),cls:'' },
+        { label: 'Investing Cash Flow',   val: fmtv(invCF),      cls: '' },
+        { label: 'Financing Cash Flow',   val: fmtv(finCF),      cls: '' },
+        { label: 'Debt Issuance',         val: fmtv(debtIssue),  cls: '' },
+        { label: 'Debt Repayment',        val: fmtv(debtRepay),  cls: '' },
+        { label: 'Stock Issuance',        val: fmtv(stockIssue), cls: '' },
+        { label: 'Stock Repurchase',      val: fmtv(stockRepurch),cls: '' },
+      ]
+    },
+  ];
+
+  sections.forEach(sec => {
+    const title = document.createElement('div');
+    title.className = 'fin-section-title';
+    title.textContent = sec.title;
+    body.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.className = 'fin-grid';
+    sec.items.forEach(item => {
+      if (item.val === '—') return; // skip missing
+      const el = document.createElement('div');
+      el.className = 'fin-item';
+      el.innerHTML = `<div class="fin-label">${item.label}</div><div class="fin-val ${item.cls}">${item.val}</div>`;
+      grid.appendChild(el);
+    });
+    if (grid.children.length) body.appendChild(grid);
+  });
+}
+
+window.addEventListener('resize', () => {
+  if (S.ticker) { renderSankey(); renderTrend(); }
+});
+
 init();
 </script>
 </body>
