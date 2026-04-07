@@ -1,0 +1,6 @@
+{
+  "tickers": ["U"],
+  "default_period": "quarterly",
+  "default_metric": "total_revenue",
+  "forecast_quarters": 4
+}

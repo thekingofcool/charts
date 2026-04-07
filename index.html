@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FINPIX — Financial Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #f5f2eb;
+  --bg2:      #eee9de;
+  --border:   #c8bfaa;
+  --ink:      #1a1612;
+  --ink2:     #5a4f3f;
+  --ink3:     #9e8e75;
+  --accent:   #d4521a;
+  --accent2:  #1a6b4a;
+  --accent3:  #1a4a8a;
+  --yellow:   #e8c84a;
+  --red:      #c8302a;
+  --green:    #2a8a52;
+  --pixel:    2px;
+  --font-px:  'Press Start 2P', monospace;
+  --font-mono:'Share Tech Mono', monospace;
+  --shadow:   4px 4px 0 #c8bfaa;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  min-height: 100vh;
+  overflow-x: hidden;
+  /* pixel grid background */
+  background-image:
+    linear-gradient(var(--bg2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bg2) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+header {
+  border-bottom: var(--pixel) solid var(--border);
+  padding: 20px 32px 16px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 var(--pixel) 0 var(--border);
+}
+
+.logo {
+  font-family: var(--font-px);
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-shadow: 2px 2px 0 #f0cfc0;
+}
+
+.ticker-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ticker-btn {
+  font-family: var(--font-px);
+  font-size: 8px;
+  padding: 6px 12px;
+  background: var(--bg2);
+  border: var(--pixel) solid var(--border);
+  cursor: pointer;
+  color: var(--ink2);
+  transition: all 0.1s;
+  box-shadow: 2px 2px 0 var(--border);
+}
+.ticker-btn:hover { background: var(--yellow); color: var(--ink); }
+.ticker-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 2px 2px 0 #8a3010;
+}
+
+.meta-info {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--ink3);
+  text-align: right;
+  line-height: 1.8;
+}
+
+/* ── CONTROLS ────────────────────────────────────────────── */
+.controls {
+  padding: 16px 32px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  border-bottom: var(--pixel) solid var(--border);
+  background: var(--bg);
+}
+
+.ctrl-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ctrl-label {
+  font-family: var(--font-px);
+  font-size: 7px;
+  color: var(--ink3);
+  text-transform: uppercase;
+}
+
+.ctrl-select, .ctrl-btn {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 4px 10px;
+  background: var(--bg2);
+  border: var(--pixel) solid var(--border);
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--border);
+}
+.ctrl-select:focus, .ctrl-btn:hover {
+  outline: none;
+  border-color: var(--accent);
+}
+.ctrl-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* ── MAIN LAYOUT ─────────────────────────────────────────── */
+main {
+  padding: 24px 32px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ── CARD ────────────────────────────────────────────────── */
+.card {
+  background: var(--bg);
+  border: var(--pixel) solid var(--border);
+  box-shadow: var(--shadow);
+  position: relative;
+}
+
+.card-header {
+  padding: 12px 16px;
+  border-bottom: var(--pixel) solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg2);
+}
+
+.card-title {
+  font-family: var(--font-px);
+  font-size: 8px;
+  color: var(--ink);
+  letter-spacing: 1px;
+}
+
+.card-sub {
+  font-size: 10px;
+  color: var(--ink3);
+}
+
+.card-body {
+  padding: 16px;
+  position: relative;
+  min-height: 300px;
+}
+
+/* ── SANKEY ──────────────────────────────────────────────── */
+#sankey-svg {
+  width: 100%;
+  overflow: visible;
+}
+
+/* ── TREND ───────────────────────────────────────────────── */
+.trend-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.metric-btn {
+  font-family: var(--font-px);
+  font-size: 7px;
+  padding: 5px 10px;
+  background: var(--bg2);
+  border: var(--pixel) solid var(--border);
+  cursor: pointer;
+  color: var(--ink2);
+  box-shadow: 2px 2px 0 var(--border);
+  transition: all 0.1s;
+}
+.metric-btn:hover { border-color: var(--accent3); color: var(--accent3); }
+.metric-btn.active {
+  background: var(--accent3);
+  color: #fff;
+  border-color: var(--accent3);
+  box-shadow: 2px 2px 0 #0a2a5a;
+}
+
+#trend-svg { width: 100%; }
+
+/* ── TOOLTIP ─────────────────────────────────────────────── */
+.tooltip {
+  position: fixed;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 8px 12px;
+  border: var(--pixel) solid var(--accent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.1s;
+  z-index: 999;
+  max-width: 220px;
+  line-height: 1.6;
+  box-shadow: 3px 3px 0 var(--accent);
+}
+
+/* ── LEGEND ──────────────────────────────────────────────── */
+.legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 10px;
+  color: var(--ink2);
+  padding: 8px 16px 12px;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot {
+  width: 10px; height: 10px;
+  border: var(--pixel) solid var(--border);
+  flex-shrink: 0;
+}
+
+/* ── LOADING ─────────────────────────────────────────────── */
+.loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-px);
+  font-size: 8px;
+  color: var(--ink3);
+  background: var(--bg);
+  z-index: 10;
+}
+.loading::after {
+  content: '...';
+  animation: dots 1s infinite;
+}
+@keyframes dots {
+  0%   { content: '.'; }
+  33%  { content: '..'; }
+  66%  { content: '...'; }
+}
+
+/* ── PERIOD PICKER ───────────────────────────────────────── */
+.period-picker { display: flex; gap: 0; }
+.period-picker .ctrl-btn {
+  border-right-width: 0;
+  box-shadow: none;
+}
+.period-picker .ctrl-btn:last-child { border-right-width: var(--pixel); }
+
+/* ── SCROLLBAR ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border: 1px solid var(--bg2);
+}
+
+/* ── SANKEY period nav ───────────────────────────────────── */
+.sankey-nav {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.nav-arrow {
+  font-family: var(--font-px);
+  font-size: 10px;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg2);
+  border: var(--pixel) solid var(--border);
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--border);
+  user-select: none;
+}
+.nav-arrow:hover { background: var(--yellow); }
+.nav-period-label {
+  font-family: var(--font-px);
+  font-size: 8px;
+  color: var(--accent);
+  min-width: 90px;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">FINPIX</div>
+  <div class="ticker-tabs" id="ticker-tabs"></div>
+  <div class="meta-info" id="meta-info">Loading...</div>
+</header>
+
+<div class="controls">
+  <div class="ctrl-group">
+    <span class="ctrl-label">Period</span>
+    <div class="period-picker">
+      <button class="ctrl-btn active" id="btn-quarterly" onclick="setPeriod('quarterly')">QTR</button>
+      <button class="ctrl-btn" id="btn-annual" onclick="setPeriod('annual')">ANN</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <!-- SANKEY -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">▌ Revenue &amp; Cost Flow</span>
+      <div class="sankey-nav">
+        <div class="nav-arrow" id="nav-prev" onclick="shiftSankey(-1)">◀</div>
+        <div class="nav-period-label" id="sankey-period-label">—</div>
+        <div class="nav-arrow" id="nav-next" onclick="shiftSankey(+1)">▶</div>
+      </div>
+    </div>
+    <div class="card-body" id="sankey-body">
+      <div class="loading" id="sankey-loading">Loading</div>
+      <svg id="sankey-svg"></svg>
+    </div>
+  </div>
+
+  <!-- TREND -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">▌ Trend &amp; Forecast</span>
+      <span class="card-sub" id="trend-sub">—</span>
+    </div>
+    <div class="card-body" id="trend-body">
+      <div class="trend-controls" id="trend-controls"></div>
+      <div class="loading" id="trend-loading">Loading</div>
+      <svg id="trend-svg"></svg>
+      <div class="legend" id="trend-legend"></div>
+    </div>
+  </div>
+</main>
+
+<div class="tooltip" id="tooltip"></div>
+
+<!-- D3 v7 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+<script>
+// ── STATE ────────────────────────────────────────────────────
+const state = {
+  tickers: [],
+  currentTicker: null,
+  period: 'quarterly',
+  sankeyIndex: 0,   // index into available dates
+  currentMetric: 'total_revenue',
+  sankeyData: {},   // { ticker: [rows] }
+  trendData: {},    // { ticker: [rows] }
+};
+
+const METRIC_LABELS = {
+  total_revenue:   'Revenue',
+  gross_profit:    'Gross Profit',
+  operating_income:'Op. Income',
+  net_income:      'Net Income',
+  eps_diluted:     'EPS (diluted)',
+  ebitda:          'EBITDA',
+};
+
+const COLORS = {
+  revenue:  '#1a4a8a',
+  cost:     '#c8302a',
+  profit:   '#2a8a52',
+  opex:     '#d4521a',
+  neutral:  '#9e8e75',
+  forecast: '#b8a080',
+};
+
+// ── TOOLTIP ─────────────────────────────────────────────────
+const tooltip = document.getElementById('tooltip');
+function showTip(html, e) {
+  tooltip.innerHTML = html;
+  tooltip.style.opacity = 1;
+  moveTip(e);
+}
+function moveTip(e) {
+  const x = e.clientX + 14, y = e.clientY - 10;
+  tooltip.style.left = Math.min(x, window.innerWidth - 240) + 'px';
+  tooltip.style.top  = Math.max(y, 4) + 'px';
+}
+function hideTip() { tooltip.style.opacity = 0; }
+
+// ── FORMAT ──────────────────────────────────────────────────
+function fmtVal(v, metric) {
+  if (v == null) return '—';
+  if (metric === 'eps_diluted') return v.toFixed(2);
+  const abs = Math.abs(v);
+  const sign = v < 0 ? '-' : '';
+  if (abs >= 1e9) return sign + '$' + (abs/1e9).toFixed(2) + 'B';
+  if (abs >= 1e6) return sign + '$' + (abs/1e6).toFixed(0) + 'M';
+  return sign + '$' + abs.toFixed(0);
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+async function init() {
+  const meta = await fetchJSON('data/meta.json');
+  state.tickers = meta.tickers || ['U'];
+
+  document.getElementById('meta-info').innerHTML =
+    `Updated: ${meta.updated_at ? meta.updated_at.slice(0,10) : '—'}`;
+
+  // build ticker tabs
+  const tabs = document.getElementById('ticker-tabs');
+  state.tickers.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'ticker-btn';
+    btn.textContent = '$' + t;
+    btn.onclick = () => selectTicker(t);
+    btn.id = 'tab-' + t;
+    tabs.appendChild(btn);
+  });
+
+  await selectTicker(state.tickers[0]);
+}
+
+async function fetchJSON(path) {
+  try { return await (await fetch(path)).json(); }
+  catch { return {}; }
+}
+
+async function fetchCSV(path) {
+  try {
+    const txt = await (await fetch(path)).text();
+    return d3.csvParse(txt);
+  } catch { return []; }
+}
+
+async function selectTicker(ticker) {
+  state.currentTicker = ticker;
+  document.querySelectorAll('.ticker-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + ticker)?.classList.add('active');
+
+  showLoading('sankey'); showLoading('trend');
+
+  // Load shared CSVs once, then slice by ticker
+  if (!state._sankeyAll) state._sankeyAll = await fetchCSV('data/sankey.csv');
+  if (!state._trendAll)  state._trendAll  = await fetchCSV('data/trend.csv');
+  state.sankeyData[ticker] = state._sankeyAll.filter(r => r.ticker === ticker);
+  state.trendData[ticker]  = state._trendAll.filter(r => r.ticker === ticker);
+
+  state.sankeyIndex = getSankeyDates().length - 1; // latest
+  renderSankey();
+  buildTrendControls();
+  renderTrend();
+}
+
+function setPeriod(p) {
+  state.period = p;
+  document.getElementById('btn-quarterly').classList.toggle('active', p === 'quarterly');
+  document.getElementById('btn-annual').classList.toggle('active', p === 'annual');
+  state.sankeyIndex = getSankeyDates().length - 1;
+  renderSankey();
+  renderTrend();
+}
+
+// ── SANKEY ──────────────────────────────────────────────────
+function getSankeyDates() {
+  const rows = (state.sankeyData[state.currentTicker] || [])
+    .filter(r => r.period_type === state.period);
+  return [...new Set(rows.map(r => r.date))].sort();
+}
+
+function shiftSankey(dir) {
+  const dates = getSankeyDates();
+  state.sankeyIndex = Math.max(0, Math.min(dates.length - 1, state.sankeyIndex + dir));
+  renderSankey();
+}
+
+function showLoading(which) {
+  document.getElementById(which + '-loading').style.display = 'flex';
+}
+function hideLoading(which) {
+  document.getElementById(which + '-loading').style.display = 'none';
+}
+
+function renderSankey() {
+  const dates = getSankeyDates();
+  const date  = dates[state.sankeyIndex];
+  document.getElementById('sankey-period-label').textContent = date || '—';
+  document.getElementById('nav-prev').style.opacity = state.sankeyIndex > 0 ? 1 : 0.3;
+  document.getElementById('nav-next').style.opacity = state.sankeyIndex < dates.length - 1 ? 1 : 0.3;
+
+  const rows = (state.sankeyData[state.currentTicker] || [])
+    .filter(r => r.period_type === state.period && r.date === date);
+
+  const svg = d3.select('#sankey-svg');
+  svg.selectAll('*').remove();
+
+  if (!rows.length || !date) { hideLoading('sankey'); return; }
+
+  const row = rows[0];
+  const g = v => parseFloat(row[v]) || 0;
+
+  const totalRev  = g('total_revenue');
+  const cogs      = g('cost_of_revenue');
+  const grossP    = g('gross_profit');
+  const opex      = g('operating_expense');
+  const opInc     = g('operating_income');
+  const interest  = Math.abs(g('interest_expense'));
+  const tax       = Math.abs(g('tax_provision'));
+  const netInc    = g('net_income');
+
+  // Build nodes + links; handle negative operating income gracefully
+  const nodes = [
+    { id: 0, name: 'Revenue' },
+    { id: 1, name: 'Cost of Revenue' },
+    { id: 2, name: 'Gross Profit' },
+    { id: 3, name: 'OpEx' },
+    { id: 4, name: 'Op. Income' },
+    { id: 5, name: 'Interest' },
+    { id: 6, name: 'Tax' },
+    { id: 7, name: 'Net Income' },
+    { id: 8, name: 'Op. Loss' },
+  ];
+
+  const links = [];
+  if (totalRev > 0) {
+    links.push({ source: 0, target: 1, value: Math.max(cogs, 1) });
+    links.push({ source: 0, target: 2, value: Math.max(grossP, 1) });
+  }
+  if (grossP > 0) {
+    if (opInc >= 0) {
+      links.push({ source: 2, target: 3, value: Math.max(opex, 1) });
+      links.push({ source: 2, target: 4, value: Math.max(opInc, 1) });
+      if (opInc > 0) {
+        links.push({ source: 4, target: 5, value: Math.max(interest, 1) });
+        links.push({ source: 4, target: 6, value: Math.max(tax, 1) });
+        links.push({ source: 4, target: 7, value: Math.max(netInc, 1) });
+      }
+    } else {
+      // Operating loss: all gross profit goes to opex, leftover = loss
+      links.push({ source: 2, target: 3, value: Math.max(grossP, 1) });
+      links.push({ source: 3, target: 8, value: Math.max(Math.abs(opInc), 1) });
+    }
+  }
+
+  const container = document.getElementById('sankey-body');
+  const W = container.clientWidth - 32;
+  const H = Math.max(320, Math.min(420, W * 0.45));
+  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+
+  const sankey = d3.sankey()
+    .nodeId(d => d.id)
+    .nodeWidth(20)
+    .nodePadding(14)
+    .extent([[0, 8], [W - 180, H - 8]]);
+
+  const { nodes: sNodes, links: sLinks } = sankey({ nodes: nodes.map(d => ({...d})), links });
+
+  const nodeColor = n => {
+    if (n.name === 'Revenue') return COLORS.revenue;
+    if (n.name.includes('Cost') || n.name.includes('OpEx') || n.name.includes('Interest') || n.name.includes('Tax')) return COLORS.cost;
+    if (n.name.includes('Gross') || n.name.includes('Op. Income')) return COLORS.profit;
+    if (n.name.includes('Net Income')) return COLORS.profit;
+    if (n.name.includes('Loss')) return COLORS.cost;
+    return COLORS.neutral;
+  };
+
+  const g2 = svg.append('g');
+
+  // links
+  g2.selectAll('.s-link')
+    .data(sLinks)
+    .join('path')
+    .attr('class', 's-link')
+    .attr('d', d3.sankeyLinkHorizontal())
+    .attr('fill', 'none')
+    .attr('stroke', d => nodeColor(d.target))
+    .attr('stroke-width', d => Math.max(1, d.width))
+    .attr('stroke-opacity', 0.25)
+    .on('mousemove', (e, d) => {
+      showTip(`<b>${d.source.name} → ${d.target.name}</b><br>${fmtVal(d.value, 'total_revenue')}`, e);
+    })
+    .on('mouseleave', hideTip);
+
+  // nodes
+  g2.selectAll('.s-node')
+    .data(sNodes)
+    .join('rect')
+    .attr('class', 's-node')
+    .attr('x', d => d.x0)
+    .attr('y', d => d.y0)
+    .attr('width', d => d.x1 - d.x0)
+    .attr('height', d => Math.max(2, d.y1 - d.y0))
+    .attr('fill', nodeColor)
+    .attr('stroke', d => d3.color(nodeColor(d)).darker(0.5))
+    .attr('stroke-width', 1)
+    .on('mousemove', (e, d) => {
+      const val = d.value || (d.sourceLinks[0]?.value);
+      showTip(`<b>${d.name}</b><br>${fmtVal(val, 'total_revenue')}`, e);
+    })
+    .on('mouseleave', hideTip);
+
+  // labels
+  g2.selectAll('.s-label')
+    .data(sNodes)
+    .join('text')
+    .attr('class', 's-label')
+    .attr('x', d => d.x1 + 6)
+    .attr('y', d => (d.y0 + d.y1) / 2)
+    .attr('dy', '0.35em')
+    .attr('font-family', "'Share Tech Mono', monospace")
+    .attr('font-size', 10)
+    .attr('fill', '#1a1612')
+    .text(d => {
+      const val = d.value || 0;
+      return `${d.name}: ${fmtVal(val, 'total_revenue')}`;
+    });
+
+  hideLoading('sankey');
+}
+
+// ── TREND ────────────────────────────────────────────────────
+function buildTrendControls() {
+  const ctrl = document.getElementById('trend-controls');
+  ctrl.innerHTML = '';
+  Object.entries(METRIC_LABELS).forEach(([key, label]) => {
+    const btn = document.createElement('button');
+    btn.className = 'metric-btn' + (key === state.currentMetric ? ' active' : '');
+    btn.textContent = label;
+    btn.onclick = () => {
+      state.currentMetric = key;
+      document.querySelectorAll('.metric-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTrend();
+    };
+    ctrl.appendChild(btn);
+  });
+}
+
+function renderTrend() {
+  const metric = state.currentMetric;
+  const allRows = (state.trendData[state.currentTicker] || [])
+    .filter(r => r.period_type === state.period && r.metric === metric)
+    .map(r => ({ date: new Date(r.date), value: parseFloat(r.value) }))
+    .sort((a, b) => a.date - b.date);
+
+  document.getElementById('trend-sub').textContent =
+    `$${state.currentTicker} · ${METRIC_LABELS[metric]} · ${state.period === 'quarterly' ? 'Quarterly' : 'Annual'}`;
+
+  const svg = d3.select('#trend-svg');
+  svg.selectAll('*').remove();
+
+  if (!allRows.length) { hideLoading('trend'); return; }
+
+  // ── simple linear forecast ──
+  const n = allRows.length;
+  const xs = allRows.map((_, i) => i);
+  const ys = allRows.map(r => r.value);
+  const xMean = d3.mean(xs), yMean = d3.mean(ys);
+  const slope = d3.sum(xs.map((x, i) => (x - xMean) * (ys[i] - yMean))) /
+                d3.sum(xs.map(x => (x - xMean) ** 2));
+  const intercept = yMean - slope * xMean;
+
+  const forecastN = 4;
+  const forecastRows = [];
+  for (let i = 1; i <= forecastN; i++) {
+    const lastDate = allRows[n - 1].date;
+    const d = new Date(lastDate);
+    if (state.period === 'quarterly') d.setMonth(d.getMonth() + 3 * i);
+    else d.setFullYear(d.getFullYear() + i);
+    forecastRows.push({ date: d, value: intercept + slope * (n - 1 + i), forecast: true });
+  }
+
+  const allData = [...allRows, ...forecastRows];
+
+  const container = document.getElementById('trend-body');
+  const W = container.clientWidth - 32;
+  const H = 280;
+  const margin = { top: 20, right: 30, bottom: 40, left: 80 };
+  const iW = W - margin.left - margin.right;
+  const iH = H - margin.top - margin.bottom;
+
+  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleTime().domain(d3.extent(allData, d => d.date)).range([0, iW]);
+  const yExt = d3.extent(allData, d => d.value);
+  const yPad = (yExt[1] - yExt[0]) * 0.12 || Math.abs(yExt[0]) * 0.1 || 1;
+  const y = d3.scaleLinear().domain([yExt[0] - yPad, yExt[1] + yPad]).range([iH, 0]);
+
+  // zero line
+  if (yExt[0] < 0 && yExt[1] > 0) {
+    g.append('line')
+      .attr('x1', 0).attr('x2', iW)
+      .attr('y1', y(0)).attr('y2', y(0))
+      .attr('stroke', '#c8bfaa').attr('stroke-width', 1).attr('stroke-dasharray', '4 3');
+  }
+
+  // grid
+  g.append('g').call(
+    d3.axisLeft(y).ticks(5).tickFormat(v => fmtVal(v, metric))
+      .tickSize(-iW)
+  )
+  .call(g2 => {
+    g2.select('.domain').remove();
+    g2.selectAll('.tick line').attr('stroke', '#e0d9cc').attr('stroke-dasharray', '3 3');
+    g2.selectAll('.tick text').attr('font-family', "'Share Tech Mono', monospace").attr('font-size', 10).attr('fill', '#9e8e75');
+  });
+
+  // x axis
+  g.append('g').attr('transform', `translate(0,${iH})`).call(
+    d3.axisBottom(x).ticks(Math.min(allData.length, 8))
+      .tickFormat(d3.timeFormat(state.period === 'quarterly' ? '%y-Q%q' : '%Y'))
+  )
+  .call(g2 => {
+    g2.select('.domain').attr('stroke', '#c8bfaa');
+    g2.selectAll('.tick line').attr('stroke', '#c8bfaa');
+    g2.selectAll('.tick text').attr('font-family', "'Share Tech Mono', monospace").attr('font-size', 10).attr('fill', '#9e8e75');
+  });
+
+  // forecast shading
+  const fStart = allRows[n - 1].date;
+  const fEnd   = forecastRows[forecastRows.length - 1].date;
+  g.append('rect')
+    .attr('x', x(fStart)).attr('y', 0)
+    .attr('width', x(fEnd) - x(fStart)).attr('height', iH)
+    .attr('fill', '#f0e8d8').attr('opacity', 0.5);
+
+  // forecast label
+  g.append('text')
+    .attr('x', x(fStart) + 4).attr('y', 12)
+    .attr('font-family', "'Press Start 2P', monospace").attr('font-size', 6)
+    .attr('fill', '#b8a080').text('FORECAST');
+
+  // area
+  const areaActual = d3.area().x(d => x(d.date)).y0(iH).y1(d => y(d.value)).curve(d3.curveMonotoneX);
+  g.append('path').datum(allRows)
+    .attr('fill', ys[ys.length-1] >= 0 ? COLORS.profit : COLORS.cost)
+    .attr('opacity', 0.08)
+    .attr('d', areaActual);
+
+  // actual line
+  const lineActual = d3.line().x(d => x(d.date)).y(d => y(d.value)).curve(d3.curveMonotoneX);
+  g.append('path').datum(allRows)
+    .attr('fill', 'none')
+    .attr('stroke', ys[ys.length-1] >= 0 ? COLORS.profit : COLORS.cost)
+    .attr('stroke-width', 2.5)
+    .attr('d', lineActual);
+
+  // forecast line
+  const fData = [allRows[n - 1], ...forecastRows];
+  g.append('path').datum(fData)
+    .attr('fill', 'none')
+    .attr('stroke', COLORS.forecast)
+    .attr('stroke-width', 2)
+    .attr('stroke-dasharray', '6 4')
+    .attr('d', lineActual);
+
+  // dots (actual)
+  g.selectAll('.dot-actual')
+    .data(allRows)
+    .join('circle')
+    .attr('class', 'dot-actual')
+    .attr('cx', d => x(d.date))
+    .attr('cy', d => y(d.value))
+    .attr('r', 4)
+    .attr('fill', d => d.value >= 0 ? COLORS.profit : COLORS.cost)
+    .attr('stroke', '#f5f2eb').attr('stroke-width', 1.5)
+    .on('mousemove', (e, d) => showTip(`<b>${d3.timeFormat('%Y-%m-%d')(d.date)}</b><br>${METRIC_LABELS[metric]}: ${fmtVal(d.value, metric)}`, e))
+    .on('mouseleave', hideTip);
+
+  // dots (forecast)
+  g.selectAll('.dot-fc')
+    .data(forecastRows)
+    .join('circle')
+    .attr('class', 'dot-fc')
+    .attr('cx', d => x(d.date))
+    .attr('cy', d => y(d.value))
+    .attr('r', 3.5)
+    .attr('fill', COLORS.forecast)
+    .attr('stroke', '#f5f2eb').attr('stroke-width', 1.5)
+    .on('mousemove', (e, d) => showTip(`<b>${d3.timeFormat('%Y-%m-%d')(d.date)} (forecast)</b><br>${METRIC_LABELS[metric]}: ${fmtVal(d.value, metric)}`, e))
+    .on('mouseleave', hideTip);
+
+  // legend
+  const legendEl = document.getElementById('trend-legend');
+  legendEl.innerHTML = `
+    <span class="legend-item">
+      <span class="legend-dot" style="background:${ys[ys.length-1] >= 0 ? COLORS.profit : COLORS.cost}"></span>
+      Actual
+    </span>
+    <span class="legend-item">
+      <span class="legend-dot" style="background:${COLORS.forecast};border-style:dashed"></span>
+      Forecast (linear)
+    </span>`;
+
+  hideLoading('trend');
+}
+
+// ── RESIZE ───────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  if (state.currentTicker) { renderSankey(); renderTrend(); }
+});
+
+// ── BOOT ─────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
