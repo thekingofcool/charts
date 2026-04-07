@@ -456,42 +456,38 @@ function renderSankey() {
 
   const links=[];
 
-  // ── 核心流向逻辑重构 ──────────────────────────────────────────
+  // ── 核心流向逻辑修改 ──────────────────────────────────────────
 
   // Layer 1: Revenue → COGS + Gross
-  if (totalRev>0) {
-    links.push({source:0,target:1,value:Math.max(cogs,MIN)});
-    links.push({source:0,target:2,value:Math.max(grossP,MIN)});
+  if (totalRev > 0) {
+    links.push({source: 0, target: 1, value: Math.max(cogs, MIN)});
+    links.push({source: 0, target: 2, value: Math.max(grossP, MIN)});
   }
 
-  // Layer 2: Gross + (OpLoss Gap) → Opex (RD & SGA) + OpInc
+  // Layer 2: Gross → Opex (RD & SGA) & Operating Result
   if (opInc >= 0) {
-    // 盈利模式：毛利覆盖所有费用并产生利润
-    links.push({source:2,target:3,value:Math.max(rdExp, MIN)});
-    links.push({source:2,target:4,value:Math.max(sgaExp, MIN)});
-    links.push({source:2,target:5,value:Math.max(opInc, MIN)});
+    // 盈利模式：毛利流向费用，剩余流向最右侧的营业利润
+    links.push({source: 2, target: 3, value: Math.max(rdExp, MIN)});
+    links.push({source: 2, target: 4, value: Math.max(sgaExp, MIN)});
+    links.push({source: 2, target: 5, value: Math.max(opInc, MIN)});
   } else {
-    // 亏损模式：毛利不足，由营业亏损(Node 6)填补缺口流入费用节点
-    const totalOpex = rdExp + sgaExp;
-    const rdRatio = totalOpex > 0 ? (rdExp / totalOpex) : 0.5;
-    const sgaRatio = 1 - rdRatio;
-
-    // 毛利按比例分配给研发和行政
-    links.push({source:2,target:3,value:Math.max(grossP * rdRatio, MIN)});
-    links.push({source:2,target:4,value:Math.max(grossP * sgaRatio, MIN)});
+    // 亏损模式：毛利全部流向费用，费用的缺口部分由“营业亏损”体现
+    // 为了让营业亏损在右侧，我们将逻辑改为：毛利流向费用，费用超出的部分流向营业亏损节点
+    links.push({source: 2, target: 3, value: Math.max(rdExp * (grossP / (rdExp + sgaExp || 1)), MIN)});
+    links.push({source: 2, target: 4, value: Math.max(sgaExp * (grossP / (rdExp + sgaExp || 1)), MIN)});
     
-    // 亏损部分按比例分配补充研发和行政
-    links.push({source:6,target:3,value:Math.max(rdExp - (grossP * rdRatio), MIN)});
-    links.push({source:6,target:4,value:Math.max(sgaExp - (grossP * sgaRatio), MIN)});
+    // 营业亏损作为费用的后续流向，确保其在最右侧
+    links.push({source: 3, target: 6, value: Math.max(rdExp - (rdExp * (grossP / (rdExp + sgaExp || 1))), MIN)});
+    links.push({source: 4, target: 6, value: Math.max(sgaExp - (sgaExp * (grossP / (rdExp + sgaExp || 1))), MIN)});
   }
 
-  // Layer 3: OpInc → Tax + Net Result
+  // Layer 3: OpInc → Tax + Net Result (仅在盈利时继续向右流动)
   if (opInc > 0) {
-    links.push({source:5,target:7,value:Math.max(tax, MIN)});
+    links.push({source: 5, target: 7, value: Math.max(tax, MIN)});
     if (netInc >= 0) {
-      links.push({source:5,target:8,value:Math.max(netInc, MIN)});
+      links.push({source: 5, target: 8, value: Math.max(netInc, MIN)});
     } else {
-      links.push({source:5,target:9,value:Math.max(Math.abs(netInc), MIN)});
+      links.push({source: 5, target: 9, value: Math.max(Math.abs(netInc), MIN)});
     }
   }
 
