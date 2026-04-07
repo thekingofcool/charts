@@ -252,7 +252,7 @@ main {
 
   <div class="card col-full">
     <div class="card-header">
-      <span class="card-title">财报预测</span>
+      <span class="card-title">财务分析</span>
       <div class="metric-tabs" id="forecast-tabs"></div>
     </div>
     <div class="card-body">
@@ -260,7 +260,6 @@ main {
         <svg id="forecast-svg" style="width:100%;display:block"></svg>
       </div>
       <div class="legend">
-        <span class="legend-item"><span class="legend-dash"></span>预估</span>
         <span class="legend-item"><span class="legend-line" style="background:var(--orange)"></span>实际</span>
       </div>
     </div>
@@ -445,55 +444,72 @@ function renderSankey() {
   const H=Math.max(340, Math.round(W*0.38));
   svg.attr('viewBox',`0 0 ${W} ${H}`).attr('height',H).style('width', W + 'px');
 
-  const MIN=1e5;
+  // ── 修复逻辑开始 ──
 
-  // Node definitions (only include what's used)
-  const nodeList=[
-    {id:0,name:'营业收入',    color:C.revenue,  type:'revenue'},
-    {id:1,name:'销售成本',    color:C.cogs,     type:'cost'},
-    {id:2,name:'毛利',        color:C.gross,    type:'profit'},
-    {id:3,name:'研发费用',    color:C.rd,       type:'cost'},
-    {id:4,name:'销售及行政',  color:C.sga,      type:'cost'},
-    {id:5,name:'营业利润',    color:C.opInc,    type:'profit'},
-    {id:6,name:'营业亏损',    color:C.opLoss,   type:'cost'},
-    {id:7,name:'所得税',      color:C.tax,      type:'cost'},
-    {id:8,name:'净利润',      color:C.netInc,   type:'profit'},
-    {id:9,name:'净亏损',      color:C.netLoss,  type:'cost'},
+  // 1. 预处理：移除保底值对比例的干扰，仅保留极小值防止 D3 绘图报错
+  const eps = 0.1; 
+  
+  // 2. 重新定义核心数据（确保逻辑守恒）
+  // 毛利在会计上严格等于 营收 - 成本
+  const calcGross = Math.max(0, totalRev - cogs);
+  // 营业费用总额
+  const totalOpex = rdExp + sgaExp;
+  
+  const nodeList = [
+    {id:0, name:'营业收入',   color:C.revenue,  type:'revenue'},
+    {id:1, name:'销售成本',   color:C.cogs,     type:'cost'},
+    {id:2, name:'毛利',       color:C.gross,    type:'profit'},
+    {id:3, name:'研发费用',   color:C.rd,       type:'cost'},
+    {id:4, name:'销售及行政', color:C.sga,      type:'cost'},
+    {id:5, name:'营业利润',   color:C.opInc,    type:'profit'},
+    {id:6, name:'营业亏损',   color:C.opLoss,   type:'cost'},
+    {id:7, name:'所得税',     color:C.tax,      type:'cost'},
+    {id:8, name:'净利润',     color:C.netInc,   type:'profit'},
+    {id:9, name:'净亏损',     color:C.netLoss,  type:'cost'},
   ];
 
-  const links=[];
+  const links = [];
 
   // Layer 1: Revenue → COGS + Gross
-  if (totalRev>0) {
-    links.push({source:0,target:1,value:Math.max(cogs,MIN)});
-    links.push({source:0,target:2,value:Math.max(grossP,MIN)});
+  // 核心：确保 source:0 的流出总和严格等于 totalRev
+  if (totalRev > 0) {
+    links.push({source:0, target:1, value: Math.max(cogs, eps)});
+    // 这里的 value 必须使用 (营收 - 成本)，否则当后端数据不平稳时，毛利会溢出
+    links.push({source:0, target:2, value: Math.max(calcGross, eps)});
   }
 
   // Layer 2: Gross → Opex breakdown + OpInc/OpLoss
-  if (grossP>0) {
-    const rdV  = Math.min(Math.max(rdExp, MIN), grossP*0.95);
-    const sgaV = Math.min(Math.max(sgaExp, MIN), grossP*0.95);
-    links.push({source:2,target:3,value:rdV});
-    links.push({source:2,target:4,value:sgaV});
-    const remainder=Math.max(grossP-rdV-sgaV, MIN);
-    if (opInc>=0) {
-      links.push({source:2,target:5,value:Math.max(opInc,MIN)});
+  if (calcGross > 0) {
+    // 研发与行政费用的流入
+    links.push({source:2, target:3, value: Math.max(rdExp, eps)});
+    links.push({source:2, target:4, value: Math.max(sgaExp, eps)});
+    
+    if (opInc >= 0) {
+      // 盈利情况：剩余流量进入营业利润
+      links.push({source:2, target:5, value: Math.max(opInc, eps)});
     } else {
-      links.push({source:2,target:6,value:remainder});
-      links.push({source:4,target:6,value:Math.max(Math.abs(opInc)-remainder,MIN)});
+      // 亏损情况：毛利全部流向亏损节点，不足以覆盖费用的部分由费用节点补齐
+      links.push({source:2, target:6, value: Math.max(calcGross - totalOpex, eps)}); 
+      // 费用也流向亏损
+      links.push({source:3, target:6, value: Math.max(rdExp, eps)});
+      links.push({source:4, target:6, value: Math.max(sgaExp, eps)});
     }
   }
 
   // Layer 3: OpInc → Tax + Net
-  if (opInc>0) {
-    if (netInc>=0) {
-      links.push({source:5,target:7,value:Math.max(tax,MIN)});
-      links.push({source:5,target:8,value:Math.max(netInc,MIN)});
+  if (opInc > 0) {
+    // 这里的所得税和净利润之和应等于 opInc
+    if (netInc >= 0) {
+      links.push({source:5, target:7, value: Math.max(tax, eps)});
+      links.push({source:5, target:8, value: Math.max(netInc, eps)});
     } else {
-      links.push({source:5,target:7,value:Math.max(tax,MIN)});
-      links.push({source:5,target:9,value:Math.max(Math.abs(netInc),MIN)});
+      // 罕见情况：营业盈利但净亏损（通常有大额营业外支出）
+      links.push({source:5, target:7, value: Math.max(tax, eps)});
+      links.push({source:5, target:9, value: Math.max(Math.abs(netInc), eps)});
     }
   }
+  
+  // ── 修复逻辑结束 ──
 
   const usedIds=new Set(links.flatMap(l=>[l.source,l.target]));
   const nodes=nodeList.filter(n=>usedIds.has(n.id)).map(d=>({...d}));
