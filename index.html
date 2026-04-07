@@ -216,24 +216,12 @@ main {
         <svg id="trend-svg" style="width:100%;display:block"></svg>
       </div>
       <div class="legend">
-        <span class="legend-item"><span class="legend-dash"></span>Estimate</span>
         <span class="legend-item"><span class="legend-line" style="background:var(--orange)"></span>Actual</span>
       </div>
     </div>
   </div>
 
   <!-- Balance Sheet + Cash Flow snapshot -->
-  <div class="card col-full" id="card-fin">
-    <div class="card-header">
-      <span class="card-title">Latest Snapshot</span>
-      <div class="sankey-nav">
-        <div class="nav-arrow" id="fin-prev" onclick="shiftFin(-1)">◀</div>
-        <div class="nav-period-label" id="fin-label">—</div>
-        <div class="nav-arrow" id="fin-next" onclick="shiftFin(+1)">▶</div>
-      </div>
-    </div>
-    <div id="fin-body"></div>
-  </div>
 </main>
 
 <div class="tooltip" id="tooltip"></div>
