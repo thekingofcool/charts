@@ -21,7 +21,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
 
       - name: Install dependencies
         run: pip install yfinance pandas
@@ -33,7 +32,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/sankey.csv data/trend.csv data/meta.json
+          git add data/sankey.csv data/trend.csv data/estimates.csv data/meta.json
           # Only commit if something actually changed
           git diff --cached --quiet || git commit -m "data: quarterly update $(date -u +%Y-%m-%d)"
           git push
