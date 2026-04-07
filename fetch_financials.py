@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
 Financial data fetcher for stock dashboard.
-Reads config.json, pulls quarterly/annual financials via yfinance,
-writes sankey.csv, trend.csv, estimates.csv into data/.
+Reads config.json, pulls income statement / balance sheet / cash flow via yfinance,
+writes sankey.csv, trend.csv, estimates.csv, balance.csv, cashflow.csv into data/.
+Full history since IPO is included (yfinance returns all available periods).
 """
 
 import json, os
@@ -13,22 +14,22 @@ from datetime import datetime
 CONFIG_FILE = "config.json"
 DATA_DIR    = "data"
 
-# Sankey fields — includes R&D and SG&A breakout
+# ── Income Statement ──────────────────────────────────────────────────────────
+
 SANKEY_FIELD_MAP = {
-    "Total Revenue":                    "total_revenue",
-    "Cost Of Revenue":                  "cost_of_revenue",
-    "Gross Profit":                     "gross_profit",
-    "Research And Development":         "rd_expense",
+    "Total Revenue":                     "total_revenue",
+    "Cost Of Revenue":                   "cost_of_revenue",
+    "Gross Profit":                      "gross_profit",
+    "Research And Development":          "rd_expense",
     "Selling General And Administration":"sga_expense",
-    "Operating Expense":                "operating_expense",   # total opex (fallback)
-    "Operating Income":                 "operating_income",
-    "Interest Expense":                 "interest_expense",
-    "Pretax Income":                    "pretax_income",
-    "Tax Provision":                    "tax_provision",
-    "Net Income":                       "net_income",
-    "EBITDA":                           "ebitda",
-    "Basic EPS":                        "eps_basic",
-    "Diluted EPS":                      "eps_diluted",
+    "Operating Income":                  "operating_income",
+    "Interest Expense":                  "interest_expense",
+    "Pretax Income":                     "pretax_income",
+    "Tax Provision":                     "tax_provision",
+    "Net Income":                        "net_income",
+    "EBITDA":                            "ebitda",
+    "Basic EPS":                         "eps_basic",
+    "Diluted EPS":                       "eps_diluted",
 }
 
 TREND_METRICS_MAP = {
@@ -38,6 +39,39 @@ TREND_METRICS_MAP = {
     "Net Income":       "net_income",
     "Diluted EPS":      "eps_diluted",
     "EBITDA":           "ebitda",
+}
+
+# ── Balance Sheet ─────────────────────────────────────────────────────────────
+
+BALANCE_FIELD_MAP = {
+    "Total Assets":                   "total_assets",
+    "Total Liabilities Net Minority Interest": "total_liabilities",
+    "Stockholders Equity":            "stockholders_equity",
+    "Cash And Cash Equivalents":      "cash",
+    "Total Debt":                     "total_debt",
+    "Net Debt":                       "net_debt",
+    "Current Assets":                 "current_assets",
+    "Current Liabilities":            "current_liabilities",
+    "Inventory":                      "inventory",
+    "Accounts Receivable":            "accounts_receivable",
+    "Retained Earnings":              "retained_earnings",
+    "Common Stock Equity":            "common_equity",
+    "Goodwill And Other Intangible Assets": "goodwill_intangibles",
+}
+
+# ── Cash Flow Statement ───────────────────────────────────────────────────────
+
+CASHFLOW_FIELD_MAP = {
+    "Operating Cash Flow":            "operating_cf",
+    "Capital Expenditure":            "capex",
+    "Free Cash Flow":                 "free_cash_flow",
+    "Investing Cash Flow":            "investing_cf",
+    "Financing Cash Flow":            "financing_cf",
+    "Issuance Of Debt":               "debt_issuance",
+    "Repayment Of Debt":              "debt_repayment",
+    "Common Stock Issuance":          "stock_issuance",
+    "Common Stock Repurchase":        "stock_repurchase",
+    "Changes In Cash":                "net_change_cash",
 }
 
 
@@ -56,13 +90,29 @@ def safe_val(val):
         return None
 
 def fuzzy_col(df, key):
+    """Case-insensitive substring match on column names."""
     return next((c for c in df.columns if key.lower() in c.lower()), None)
 
-def fetch_income_statement(sym: str, period: str) -> pd.DataFrame:
+def fetch_statement(sym: str, kind: str, period: str) -> pd.DataFrame:
+    """
+    kind: 'income' | 'balance' | 'cashflow'
+    period: 'quarterly' | 'annual'
+    Returns transposed DataFrame indexed by date, sorted ascending.
+    yfinance returns all available periods (full history since IPO).
+    """
     tk = yf.Ticker(sym)
-    raw = tk.quarterly_income_stmt if period == "quarterly" else tk.income_stmt
+    attr_map = {
+        ("income",    "quarterly"): "quarterly_income_stmt",
+        ("income",    "annual"):    "income_stmt",
+        ("balance",   "quarterly"): "quarterly_balance_sheet",
+        ("balance",   "annual"):    "balance_sheet",
+        ("cashflow",  "quarterly"): "quarterly_cashflow",
+        ("cashflow",  "annual"):    "cashflow",
+    }
+    attr = attr_map.get((kind, period))
+    raw = getattr(tk, attr, None)
     if raw is None or raw.empty:
-        print(f"  [WARN] No {period} income statement for {sym}")
+        print(f"  [WARN] No {period} {kind} for {sym}")
         return pd.DataFrame()
     df = raw.T.copy()
     df.index = pd.to_datetime(df.index)
@@ -70,16 +120,11 @@ def fetch_income_statement(sym: str, period: str) -> pd.DataFrame:
     return df.sort_index()
 
 def fetch_estimates(sym: str) -> list:
-    """
-    Pull current analyst estimates from yfinance.
-    Returns rows: {ticker, period_type, date, metric, estimate}
-    yfinance provides earnings_estimate (EPS) and revenue_estimate.
-    These are *current* estimates, not historical — labelled accordingly.
-    """
+    """Current analyst EPS and revenue estimates (0q, +1q, 0y, +1y)."""
     tk = yf.Ticker(sym)
     rows = []
     try:
-        ee = tk.earnings_estimate   # index: 0q,+1q,0y,+1y
+        ee = tk.earnings_estimate
         re = tk.revenue_estimate
         for period_label, idx in [("quarterly", ["0q", "+1q"]), ("annual", ["0y", "+1y"])]:
             for i in idx:
@@ -97,7 +142,9 @@ def fetch_estimates(sym: str) -> list:
         print(f"  [WARN] estimates fetch failed for {sym}: {e}")
     return rows
 
-def collect_sankey_rows(sym: str, df_q: pd.DataFrame, df_a: pd.DataFrame) -> list:
+def collect_rows_from_map(sym: str, df_q: pd.DataFrame, df_a: pd.DataFrame,
+                          field_map: dict) -> list:
+    """Generic row collector for any statement + field map."""
     rows = []
     for period_type, df in [("quarterly", df_q), ("annual", df_a)]:
         if df.empty:
@@ -105,7 +152,7 @@ def collect_sankey_rows(sym: str, df_q: pd.DataFrame, df_a: pd.DataFrame) -> lis
         for dt, row in df.iterrows():
             record = {"ticker": sym.upper(), "period_type": period_type,
                       "date": dt.strftime("%Y-%m-%d")}
-            for src_col, dest_col in SANKEY_FIELD_MAP.items():
+            for src_col, dest_col in field_map.items():
                 matched = fuzzy_col(df, src_col)
                 record[dest_col] = safe_val(row[matched]) if matched else None
             rows.append(record)
@@ -135,20 +182,37 @@ def main():
     print(f"Fetching data for: {tickers}")
 
     all_sankey, all_trend, all_estimates = [], [], []
+    all_balance, all_cashflow = [], []
 
     for sym in tickers:
         print(f"\n--- {sym} ---")
-        df_q = fetch_income_statement(sym, "quarterly")
-        df_a = fetch_income_statement(sym, "annual")
-        all_sankey.extend(collect_sankey_rows(sym, df_q, df_a))
-        all_trend.extend(collect_trend_rows(sym, df_q, df_a))
+
+        # Income statement
+        df_inc_q = fetch_statement(sym, "income",   "quarterly")
+        df_inc_a = fetch_statement(sym, "income",   "annual")
+        all_sankey.extend(collect_rows_from_map(sym, df_inc_q, df_inc_a, SANKEY_FIELD_MAP))
+        all_trend.extend(collect_trend_rows(sym, df_inc_q, df_inc_a))
         all_estimates.extend(fetch_estimates(sym))
 
-    pd.DataFrame(all_sankey).to_csv(os.path.join(DATA_DIR, "sankey.csv"),    index=False)
-    pd.DataFrame(all_trend).to_csv(os.path.join(DATA_DIR,  "trend.csv"),     index=False)
-    pd.DataFrame(all_estimates).to_csv(os.path.join(DATA_DIR, "estimates.csv"), index=False)
+        # Balance sheet
+        df_bal_q = fetch_statement(sym, "balance",  "quarterly")
+        df_bal_a = fetch_statement(sym, "balance",  "annual")
+        all_balance.extend(collect_rows_from_map(sym, df_bal_q, df_bal_a, BALANCE_FIELD_MAP))
 
-    for name, lst in [("sankey", all_sankey), ("trend", all_trend), ("estimates", all_estimates)]:
+        # Cash flow
+        df_cf_q  = fetch_statement(sym, "cashflow", "quarterly")
+        df_cf_a  = fetch_statement(sym, "cashflow", "annual")
+        all_cashflow.extend(collect_rows_from_map(sym, df_cf_q, df_cf_a, CASHFLOW_FIELD_MAP))
+
+    pd.DataFrame(all_sankey).to_csv(  os.path.join(DATA_DIR, "sankey.csv"),   index=False)
+    pd.DataFrame(all_trend).to_csv(   os.path.join(DATA_DIR, "trend.csv"),    index=False)
+    pd.DataFrame(all_estimates).to_csv(os.path.join(DATA_DIR, "estimates.csv"),index=False)
+    pd.DataFrame(all_balance).to_csv( os.path.join(DATA_DIR, "balance.csv"),  index=False)
+    pd.DataFrame(all_cashflow).to_csv(os.path.join(DATA_DIR, "cashflow.csv"), index=False)
+
+    for name, lst in [("sankey", all_sankey), ("trend", all_trend),
+                      ("estimates", all_estimates), ("balance", all_balance),
+                      ("cashflow", all_cashflow)]:
         print(f"Written: data/{name}.csv  ({len(lst)} rows)")
 
     meta = {"tickers": tickers, "updated_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")}
