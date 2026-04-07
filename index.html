@@ -44,32 +44,34 @@ header {
   border-bottom: 1px solid var(--border);
   padding: 12px 24px;
   display: flex; align-items: center; gap: 16px;
+  flex-wrap: wrap; /* [优化] 移动端自适应折行 */
   position: sticky; top: 0; z-index: 200;
 }
 .logo {
-  font-family: var(--pixel); font-size: 11px;
+  font-family: var(--pixel); font-size: 14px; /* [优化] 增大字号 */
   color: var(--blue); letter-spacing: 2px;
 }
-.ticker-tabs { display: flex; gap: 6px; }
+.ticker-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
 .ticker-btn {
-  font-family: var(--pixel); font-size: 7px;
-  padding: 6px 12px; border-radius: var(--radius);
+  font-family: var(--pixel); font-size: 10px; /* [优化] 增大字号 */
+  padding: 8px 12px; border-radius: var(--radius);
   background: var(--bg3); border: 1px solid var(--border);
   color: var(--ink2); cursor: pointer; transition: all .12s;
 }
 .ticker-btn:hover { border-color: var(--blue); color: var(--blue); }
 .ticker-btn.active { background: var(--blue2); border-color: var(--blue); color: #fff; }
-.meta-info { margin-left: auto; font-size: 11px; color: var(--ink3); text-align: right; line-height: 1.7; }
+.meta-info { margin-left: auto; font-size: 12px; color: var(--ink3); text-align: right; line-height: 1.7; }
 
 /* ── CONTROLS ── */
 .controls {
   background: var(--bg2); border-bottom: 1px solid var(--border);
   padding: 8px 24px; display: flex; gap: 12px; align-items: center;
+  flex-wrap: wrap; /* [优化] */
 }
-.ctrl-label { font-family: var(--pixel); font-size: 6px; color: var(--ink3); text-transform: uppercase; }
+.ctrl-label { font-family: var(--pixel); font-size: 10px; color: var(--ink3); text-transform: uppercase; }
 .period-picker { display: flex; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 .period-btn {
-  font-family: var(--pixel); font-size: 7px; padding: 5px 14px;
+  font-family: var(--pixel); font-size: 10px; padding: 8px 14px; /* [优化] */
   background: transparent; border: none; color: var(--ink2); cursor: pointer; transition: all .1s;
 }
 .period-btn + .period-btn { border-left: 1px solid var(--border); }
@@ -99,24 +101,34 @@ main {
   padding: 12px 16px;
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  flex-wrap: wrap; /* [优化] */
   background: var(--bg3);
 }
 .card-title {
-  font-family: var(--pixel); font-size: 7px; color: var(--ink); letter-spacing: 1px;
+  font-family: var(--pixel); font-size: 12px; color: var(--ink); letter-spacing: 1px; /* [优化] */
 }
 .card-body { padding: 16px; }
+
+/* [优化] 引入滚动容器防止移动端图表被极限挤压变形 */
+.chart-scroll-wrap {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) var(--bg3);
+}
 
 /* ── SANKEY NAV ── */
 .sankey-nav { display: flex; align-items: center; gap: 8px; }
 .nav-arrow {
-  width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
   background: var(--bg4); border: 1px solid var(--border); border-radius: 4px;
-  color: var(--ink2); cursor: pointer; font-size: 11px; user-select: none;
+  color: var(--ink2); cursor: pointer; font-size: 14px; user-select: none;
   transition: all .1s;
 }
 .nav-arrow:hover { border-color: var(--blue); color: var(--blue); }
 .nav-period-label {
-  font-family: var(--pixel); font-size: 7px; color: var(--orange);
+  font-family: var(--pixel); font-size: 10px; color: var(--orange); /* [优化] */
   min-width: 80px; text-align: center;
 }
 
@@ -127,7 +139,7 @@ main {
   overflow: hidden; flex-wrap: wrap;
 }
 .metric-tab {
-  font-family: var(--pixel); font-size: 6px; padding: 6px 11px;
+  font-family: var(--pixel); font-size: 10px; padding: 8px 12px; /* [优化] */
   background: transparent; border: none; color: var(--ink2); cursor: pointer;
   border-right: 1px solid var(--border); white-space: nowrap; transition: all .1s;
 }
@@ -142,15 +154,16 @@ main {
   background: var(--bg);
 }
 .kpi {
-  display: flex; flex-direction: column; gap: 3px;
-  padding: 8px 14px; background: var(--bg3);
-  border: 1px solid var(--border); border-radius: 4px; min-width: 110px;
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 10px 14px; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: 4px; min-width: 120px;
+  flex: 1 1 auto; /* [优化] 让指标块在移动端更好地平铺铺满 */
 }
-.kpi-label { font-size: 10px; color: var(--ink3); }
-.kpi-value { font-size: 18px; font-weight: 700; color: var(--ink); letter-spacing: 0.5px; }
+.kpi-label { font-size: 12px; color: var(--ink3); } /* [优化] */
+.kpi-value { font-size: 20px; font-weight: 700; color: var(--ink); letter-spacing: 0.5px; } /* [优化] */
 .kpi-value.pos { color: var(--green); }
 .kpi-value.neg { color: var(--red); }
-.kpi-delta { font-size: 10px; }
+.kpi-delta { font-size: 12px; } /* [优化] */
 .kpi-delta.pos { color: var(--green); }
 .kpi-delta.neg { color: var(--red); }
 
@@ -193,7 +206,10 @@ main {
 .analysis-grid {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px;
 }
-@media(max-width:900px) { main { grid-template-columns: 1fr; } .analysis-grid { grid-template-columns: 1fr 1fr; } }
+@media(max-width:900px) { 
+  main { grid-template-columns: 1fr; padding: 12px; } 
+  .analysis-grid { grid-template-columns: 1fr; } /* [优化] 移动端设为单列 */
+}
 </style>
 </head>
 <body>
@@ -212,7 +228,6 @@ main {
 </div>
 
 <main>
-  <!-- SANKEY — full width -->
   <div class="card col-full" id="card-sankey">
     <div class="card-header">
       <span class="card-title">收支拆解</span>
@@ -222,10 +237,11 @@ main {
         <div class="nav-arrow" id="nav-next" onclick="shiftSankey(+1)">▶</div>
       </div>
     </div>
-    <!-- KPI summary strip -->
     <div class="kpi-row" id="kpi-row"></div>
     <div class="card-body" style="padding:16px 16px 8px">
-      <svg id="sankey-svg" style="width:100%;overflow:visible;display:block"></svg>
+      <div class="chart-scroll-wrap">
+        <svg id="sankey-svg" style="width:100%;overflow:visible;display:block"></svg>
+      </div>
       <div class="legend">
         <span class="legend-item"><span class="legend-dot" style="background:var(--blue)"></span>收入</span>
         <span class="legend-item"><span class="legend-dot" style="background:var(--orange)"></span>支出</span>
@@ -234,14 +250,15 @@ main {
     </div>
   </div>
 
-  <!-- FORECAST / ESTIMATES -->
   <div class="card col-full">
     <div class="card-header">
       <span class="card-title">财报预测</span>
       <div class="metric-tabs" id="forecast-tabs"></div>
     </div>
     <div class="card-body">
-      <svg id="forecast-svg" style="width:100%;display:block"></svg>
+      <div class="chart-scroll-wrap">
+        <svg id="forecast-svg" style="width:100%;display:block"></svg>
+      </div>
       <div class="legend">
         <span class="legend-item"><span class="legend-dash"></span>预估</span>
         <span class="legend-item"><span class="legend-line" style="background:var(--orange)"></span>实际</span>
@@ -423,9 +440,10 @@ function renderSankey() {
 
   // ── LAYOUT ──
   const body=document.getElementById('card-sankey');
-  const W=body.clientWidth-32;
+  // [优化] 确保最小宽度为 600px，低于此宽度则触发外部容器横向滚动
+  const W=Math.max(body.clientWidth-32, 600); 
   const H=Math.max(340, Math.round(W*0.38));
-  svg.attr('viewBox',`0 0 ${W} ${H}`).attr('height',H);
+  svg.attr('viewBox',`0 0 ${W} ${H}`).attr('height',H).style('width', W + 'px');
 
   const MIN=1e5;
 
@@ -562,7 +580,7 @@ function renderSankey() {
     grp.append('text')
       .attr('x',nd.x1+8).attr('y',nd.y0-5)
       .attr('font-family',"'Press Start 2P',monospace")
-      .attr('font-size',6)
+      .attr('font-size',9) /* [优化] 增大D3图表内的百分比文字底线 */
       .attr('fill',nd.color)
       .text(pctStr(val,totalRev));
   });
@@ -591,13 +609,14 @@ function renderForecast() {
   svg.selectAll('*').remove();
   if (!actual.length) return;
 
-  const body=document.getElementById('card-sankey'); // use same ref for width
-  const W=body.clientWidth-32;
+  const body=document.getElementById('card-sankey'); 
+  // [优化] 确保折线图最小宽度 500px，否则触发外部容器横向滚动
+  const W=Math.max(body.clientWidth-32, 500); 
   const H=260;
   const M={top:30,right:20,bottom:44,left:isEPS?56:80};
   const iW=W-M.left-M.right, iH=H-M.top-M.bottom;
 
-  svg.attr('viewBox',`0 0 ${W} ${H}`).attr('height',H);
+  svg.attr('viewBox',`0 0 ${W} ${H}`).attr('height',H).style('width', W + 'px');
   const g=svg.append('g').attr('transform',`translate(${M.left},${M.top})`);
 
   const allVals=[...actual.map(d=>d.value),...estPts.map(d=>d.estimate)];
