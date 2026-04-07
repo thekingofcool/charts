@@ -1,0 +1,39 @@
+name: Fetch Financial Data
+
+on:
+  schedule:
+    # Runs ~2 weeks after each quarter end: mid-Feb, mid-May, mid-Aug, mid-Nov
+    - cron: '0 2 15 2,5,8,11 *'
+  workflow_dispatch: # allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install yfinance pandas
+
+      - name: Fetch financial data
+        run: python fetch_financials.py
+
+      - name: Commit and push updated data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/sankey.csv data/trend.csv data/meta.json
+          # Only commit if something actually changed
+          git diff --cached --quiet || git commit -m "data: quarterly update $(date -u +%Y-%m-%d)"
+          git push
