@@ -1,116 +1,651 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Institutional Grade Financial Dashboard</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
-    <style>
-        :root {
-            --bg: #0a0a0c; --card: #141417; --border: #2d2d32;
-            --blue: #007aff; --orange: #ff9500; --text: #e2e2e7; --dim: #8e8e93;
-        }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 24px; }
-        .dashboard { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; max-width: 1600px; margin: 0 auto; }
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; position: relative; }
-        .card-header { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); margin-bottom: 24px; display: flex; align-items: center; }
-        .card-header::before { content: ''; width: 3px; height: 14px; background: var(--blue); margin-right: 10px; border-radius: 2px; }
-        svg { width: 100%; height: 450px; overflow: visible; }
-        .axis text { fill: var(--dim); font-size: 11px; }
-        .axis path, .axis line { stroke: var(--border); }
-        .tooltip { position: absolute; background: rgba(20,20,23,0.9); border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px; font-size: 12px; pointer-events: none; opacity: 0; z-index: 100; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>financial dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #f5f2eb;
+  --bg2:     #eceadf;
+  --bg3:     #e4e0d2;
+  --border:  #ccc5b0;
+  --ink:     #1a1612;
+  --ink2:    #4a4030;
+  --ink3:    #9a8e78;
+  --accent:  #c84818;
+  --blue:    #1a4888;
+  --green:   #1e7a48;
+  --red:     #b82820;
+  --amber:   #c87800;
+  --purple:  #5a3a8a;
+  --px: 2px;
+  --mono: 'Share Tech Mono', monospace;
+  --pixel: 'Press Start 2P', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--mono);
+  background-image:
+    linear-gradient(var(--bg2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bg2) 1px, transparent 1px);
+  background-size: 20px 20px;
+  min-height: 100vh;
+}
+
+/* HEADER */
+header {
+  background: var(--bg);
+  border-bottom: var(--px) solid var(--border);
+  box-shadow: 0 var(--px) 0 var(--border);
+  padding: 14px 28px;
+  display: flex; align-items: center; gap: 20px;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo { font-family: var(--pixel); font-size: 13px; color: var(--accent); letter-spacing: 2px; text-shadow: 2px 2px 0 #f0d0c0; }
+.ticker-tabs { display: flex; gap: 6px; }
+.ticker-btn {
+  font-family: var(--pixel); font-size: 8px; padding: 7px 14px;
+  background: var(--bg2); border: var(--px) solid var(--border);
+  cursor: pointer; color: var(--ink2); box-shadow: 2px 2px 0 var(--border);
+  transition: background .08s;
+}
+.ticker-btn:hover { background: #f5d060; }
+.ticker-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 2px 2px 0 #802800; }
+.meta-info { margin-left: auto; font-size: 11px; color: var(--ink3); text-align: right; line-height: 1.7; }
+
+/* CONTROLS */
+.controls {
+  background: var(--bg); border-bottom: var(--px) solid var(--border);
+  padding: 10px 28px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+}
+.ctrl-label { font-family: var(--pixel); font-size: 7px; color: var(--ink3); }
+.period-picker { display: flex; }
+.period-btn {
+  font-family: var(--pixel); font-size: 7px; padding: 6px 13px;
+  background: var(--bg2); border: var(--px) solid var(--border);
+  cursor: pointer; color: var(--ink2); border-right-width: 0;
+}
+.period-btn:last-child { border-right-width: var(--px); }
+.period-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+.period-btn:hover:not(.active) { background: var(--bg3); }
+
+/* MAIN */
+main { padding: 20px 28px; display: grid; gap: 20px; max-width: 1440px; margin: 0 auto; }
+
+/* CARD */
+.card { background: var(--bg); border: var(--px) solid var(--border); box-shadow: 4px 4px 0 var(--border); }
+.card-header {
+  padding: 11px 16px; background: var(--bg2);
+  border-bottom: var(--px) solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.card-title { font-family: var(--pixel); font-size: 8px; color: var(--ink); letter-spacing: 1px; }
+.card-body { padding: 16px; position: relative; }
+
+/* SANKEY NAV */
+.sankey-nav { display: flex; align-items: center; gap: 8px; }
+.nav-arrow {
+  font-family: var(--pixel); font-size: 9px; width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg2); border: var(--px) solid var(--border);
+  cursor: pointer; box-shadow: 2px 2px 0 var(--border); user-select: none;
+}
+.nav-arrow:hover { background: #f5d060; }
+.nav-period-label { font-family: var(--pixel); font-size: 8px; color: var(--accent); min-width: 96px; text-align: center; }
+
+/* TREND METRIC BUTTONS */
+.metric-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.metric-btn {
+  font-family: var(--pixel); font-size: 7px; padding: 5px 10px;
+  background: var(--bg2); border: var(--px) solid var(--border);
+  cursor: pointer; color: var(--ink2); box-shadow: 2px 2px 0 var(--border);
+}
+.metric-btn:hover { border-color: var(--blue); }
+.metric-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); box-shadow: 2px 2px 0 #0a1e4a; }
+
+/* LEGEND */
+.legend { display: flex; gap: 16px; flex-wrap: wrap; padding: 8px 0 2px; font-size: 12px; color: var(--ink2); align-items: center; }
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-swatch { width: 14px; height: 14px; border: var(--px) solid var(--border); flex-shrink: 0; }
+.legend-line { width: 22px; height: 3px; flex-shrink: 0; }
+.legend-dashed { width: 22px; border-top: 2.5px dashed var(--blue); flex-shrink: 0; }
+
+/* TOOLTIP */
+.tooltip {
+  position: fixed; background: #1a1612; color: #f5f2eb;
+  font-family: var(--mono); font-size: 12px; line-height: 1.65;
+  padding: 9px 13px; border: var(--px) solid var(--accent);
+  pointer-events: none; opacity: 0; z-index: 999;
+  max-width: 240px; box-shadow: 3px 3px 0 var(--accent);
+  transition: opacity .1s;
+}
+
+/* SVG text defaults */
+.axis-label { font-family: 'Share Tech Mono', monospace; fill: var(--ink3); }
+</style>
 </head>
 <body>
-    <div class="dashboard">
-        <div class="card">
-            <div class="card-header">资金流向 (桑基图 - 最新季度)</div>
-            <svg id="sankey-view"></svg>
-        </div>
-        <div class="card">
-            <div class="card-header">EPS 与营收趋势 (季度)</div>
-            <svg id="trend-view"></svg>
-        </div>
+
+<header>
+  <div class="logo">CHARTS</div>
+  <div class="ticker-tabs" id="ticker-tabs"></div>
+  <div class="meta-info" id="meta-info">—</div>
+</header>
+
+<div class="controls">
+    <button class="period-btn active" id="btn-q" onclick="setPeriod('quarterly')">QTR</button>
+    <button class="period-btn" id="btn-a" onclick="setPeriod('annual')">ANN</button>
+</div>
+
+<main>
+  <!-- SANKEY -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">▌ Revenue &amp; Cost Flow</span>
+      <div class="sankey-nav">
+        <div class="nav-arrow" id="nav-prev" onclick="shiftSankey(-1)">◀</div>
+        <div class="nav-period-label" id="sankey-label">—</div>
+        <div class="nav-arrow" id="nav-next" onclick="shiftSankey(+1)">▶</div>
+      </div>
     </div>
-    <div id="tip" class="tooltip"></div>
+    <div class="card-body" id="sankey-body" style="min-height:420px">
+      <svg id="sankey-svg" style="width:100%;overflow:visible"></svg>
+    </div>
+  </div>
 
-    <script>
-    const COLORS = { blue: '#007aff', orange: '#ff9500', green: '#34c759', gray: '#3a3a3c' };
+  <!-- TREND -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">▌ Actuals vs Analyst Estimates</span>
+      <span id="trend-sub" style="font-size:11px;color:var(--ink3)">—</span>
+    </div>
+    <div class="card-body" id="trend-body">
+      <div class="metric-btns" id="metric-btns"></div>
+      <svg id="trend-svg" style="width:100%"></svg>
+      <div class="legend" id="trend-legend"></div>
+    </div>
+  </div>
+</main>
 
-    async function start() {
-        const [sankeyRaw, trendRaw] = await Promise.all([
-            d3.csv("data/sankey.csv"), d3.csv("data/trend.csv")
-        ]);
+<div class="tooltip" id="tooltip"></div>
 
-        const ticker = new URLSearchParams(window.location.search).get('s') || "U";
-        renderSankey(sankeyRaw.find(d => d.ticker === ticker), ticker);
-        renderTrend(trendRaw.filter(d => d.ticker === ticker));
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+<script>
+// ─── STATE ───────────────────────────────────────────────────
+const S = {
+  tickers: [], ticker: null, period: 'quarterly', sankeyIdx: 0,
+  metric: 'total_revenue',
+  _sankeyAll: null, _trendAll: null, _estAll: null,
+  sankey: {}, trend: {}, est: {}
+};
+
+const METRIC_LABELS = {
+  total_revenue: '营业收入', gross_profit: '毛利润',
+  operating_income: '营业利润', net_income: '净利润',
+  eps_diluted: 'EPS (摊薄)', ebitda: 'EBITDA'
+};
+
+// Node color palette
+const NC = {
+  revenue:  '#1a4888',
+  cogs:     '#b82820',
+  gross:    '#1e7a48',
+  rd:       '#5a3a8a',
+  sga:      '#c87800',
+  opInc:    '#1e7a48',
+  opLoss:   '#b82820',
+  tax:      '#9a8e78',
+  net:      '#1a4888',
+  other:    '#6a8a6a',
+};
+
+// ─── TOOLTIP ────────────────────────────────────────────────
+const tip = document.getElementById('tooltip');
+function showTip(html, e) { tip.innerHTML = html; tip.style.opacity = 1; moveTip(e); }
+function moveTip(e) {
+  tip.style.left = Math.min(e.clientX + 14, window.innerWidth - 260) + 'px';
+  tip.style.top  = Math.max(e.clientY - 10, 4) + 'px';
+}
+function hideTip() { tip.style.opacity = 0; }
+
+// ─── FORMAT ─────────────────────────────────────────────────
+function fmt(v, metric) {
+  if (v == null) return '—';
+  if (metric === 'eps_diluted') return (v >= 0 ? '' : '') + v.toFixed(2);
+  const s = v < 0 ? '-' : '', a = Math.abs(v);
+  if (a >= 1e9) return s + '$' + (a/1e9).toFixed(2) + 'B';
+  if (a >= 1e6) return s + '$' + (a/1e6).toFixed(1) + 'M';
+  return s + '$' + a.toFixed(0);
+}
+function pct(a, b) { return b ? ((a/b)*100).toFixed(1)+'%' : '—'; }
+
+// ─── CSV ─────────────────────────────────────────────────────
+async function fetchCSV(p) {
+  try { return d3.csvParse(await (await fetch(p)).text()); }
+  catch { return []; }
+}
+async function fetchJSON(p) {
+  try { return await (await fetch(p)).json(); } catch { return {}; }
+}
+
+// ─── INIT ────────────────────────────────────────────────────
+async function init() {
+  const meta = await fetchJSON('data/meta.json');
+  S.tickers = meta.tickers || ['U'];
+  document.getElementById('meta-info').innerHTML =
+    `Updated: ${(meta.updated_at||'').slice(0,10)||'—'}`;
+
+  const tabs = document.getElementById('ticker-tabs');
+  S.tickers.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'ticker-btn'; b.textContent = '$'+t; b.id = 'tab-'+t;
+    b.onclick = () => selectTicker(t);
+    tabs.appendChild(b);
+  });
+
+  // Preload all CSVs once
+  [S._sankeyAll, S._trendAll, S._estAll] = await Promise.all([
+    fetchCSV('data/sankey.csv'), fetchCSV('data/trend.csv'), fetchCSV('data/estimates.csv')
+  ]);
+
+  await selectTicker(S.tickers[0]);
+}
+
+async function selectTicker(t) {
+  S.ticker = t;
+  document.querySelectorAll('.ticker-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+t)?.classList.add('active');
+  S.sankey[t] = S._sankeyAll.filter(r => r.ticker === t);
+  S.trend[t]  = S._trendAll.filter(r => r.ticker === t);
+  S.est[t]    = S._estAll.filter(r => r.ticker === t);
+  S.sankeyIdx = getSankeyDates().length - 1;
+  renderSankey();
+  buildMetricBtns();
+  renderTrend();
+}
+
+function setPeriod(p) {
+  S.period = p;
+  document.getElementById('btn-q').classList.toggle('active', p==='quarterly');
+  document.getElementById('btn-a').classList.toggle('active', p==='annual');
+  S.sankeyIdx = getSankeyDates().length - 1;
+  renderSankey(); renderTrend();
+}
+
+// ─── SANKEY ─────────────────────────────────────────────────
+function getSankeyDates() {
+  return [...new Set(
+    (S.sankey[S.ticker]||[]).filter(r=>r.period_type===S.period).map(r=>r.date)
+  )].sort();
+}
+
+function shiftSankey(d) {
+  const dates = getSankeyDates();
+  S.sankeyIdx = Math.max(0, Math.min(dates.length-1, S.sankeyIdx+d));
+  renderSankey();
+}
+
+function renderSankey() {
+  const dates = getSankeyDates();
+  const date  = dates[S.sankeyIdx];
+  document.getElementById('sankey-label').textContent = date || '—';
+  document.getElementById('nav-prev').style.opacity = S.sankeyIdx > 0 ? 1 : 0.3;
+  document.getElementById('nav-next').style.opacity = S.sankeyIdx < dates.length-1 ? 1 : 0.3;
+
+  const rows = (S.sankey[S.ticker]||[]).filter(r=>r.period_type===S.period && r.date===date);
+  const svg  = d3.select('#sankey-svg');
+  svg.selectAll('*').remove();
+  if (!rows.length) return;
+
+  const r   = rows[0];
+  const g   = k => parseFloat(r[k]) || 0;
+
+  const totalRev = g('total_revenue');
+  const cogs     = g('cost_of_revenue');
+  const grossP   = Math.max(g('gross_profit'), 0);
+  const rdExp    = Math.max(g('rd_expense'), 0);
+  const sgaExp   = Math.max(g('sga_expense'), 0);
+  const opInc    = g('operating_income');    // may be negative
+  const tax      = Math.abs(g('tax_provision'));
+  const netInc   = g('net_income');          // may be negative
+
+  // ── Build node/link sets for positive-flow Sankey ──
+  // Strategy: use absolute values as widths; color & label convey sign
+  const nodes = [
+    { id:0, name:'营业收入' },
+    { id:1, name:'销售成本' },
+    { id:2, name:'毛利润' },
+    { id:3, name:'研发费用' },
+    { id:4, name:'销售及行政' },
+    { id:5, name:'营业利润' },
+    { id:6, name:'所得税' },
+    { id:7, name:'净利润' },
+    { id:8, name:'营业亏损' },   // used when opInc < 0
+    { id:9, name:'净亏损' },     // used when netInc < 0
+  ];
+
+  const links = [];
+  const MIN = 1e4; // floor to keep sankey renderable
+
+  if (totalRev > 0) {
+    links.push({ source:0, target:1, value: Math.max(cogs, MIN) });
+    links.push({ source:0, target:2, value: Math.max(grossP, MIN) });
+  }
+
+  if (grossP > 0) {
+    const rdVal  = Math.min(rdExp,  grossP * 0.98);
+    const sgaVal = Math.min(sgaExp, grossP * 0.98);
+
+    if (opInc >= 0) {
+      // profitable: grossP → rd + sga + opInc
+      const residual = Math.max(grossP - rdVal - sgaVal, MIN);
+      links.push({ source:2, target:3, value: Math.max(rdVal, MIN) });
+      links.push({ source:2, target:4, value: Math.max(sgaVal, MIN) });
+      links.push({ source:2, target:5, value: residual });
+      // opInc → tax + netInc
+      if (netInc >= 0) {
+        links.push({ source:5, target:6, value: Math.max(tax, MIN) });
+        links.push({ source:5, target:7, value: Math.max(netInc, MIN) });
+      } else {
+        links.push({ source:5, target:6, value: Math.max(tax, MIN) });
+        links.push({ source:5, target:9, value: Math.max(Math.abs(netInc), MIN) });
+      }
+    } else {
+      // operating loss: rd + sga exceed grossP
+      links.push({ source:2, target:3, value: Math.max(rdVal, MIN) });
+      links.push({ source:2, target:4, value: Math.max(sgaVal, MIN) });
+      // excess opex beyond grossP shown as loss bubble from node 4
+      const excess = Math.max(Math.abs(opInc) - grossP, MIN);
+      links.push({ source:4, target:8, value: excess });
     }
+  }
 
-    function renderSankey(d, ticker) {
-        if (!d) return;
-        const svg = d3.select("#sankey-view"), width = 700, height = 400;
-        svg.selectAll("*").remove();
+  // ─ layout ─
+  const body = document.getElementById('sankey-body');
+  const W = body.clientWidth - 32;
+  const H = Math.max(380, Math.round(W * 0.46));
+  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
 
-        const data = {
-            nodes: [{name:"营收"}, {name:"成本"}, {name:"毛利"}, {name:"研发"}, {name:"营销/管理"}, {name:"净利"}],
-            links: [
-                {source:0, target:1, value: +d.cost_of_revenue},
-                {source:0, target:2, value: +d.gross_profit},
-                {source:2, target:3, value: +d.rd_expense},
-                {source:2, target:4, value: +d.sga_expense},
-                {source:2, target:5, value: Math.max(0, +d.net_income)}
-            ]
-        };
+  const sankey = d3.sankey()
+    .nodeId(d => d.id)
+    .nodeWidth(22)
+    .nodePadding(18)
+    .extent([[0, 10], [W - 210, H - 10]]);
 
-        const sankey = d3.sankey().nodeWidth(10).nodePadding(50).extent([[10, 10], [width-180, height-10]]);
-        const {nodes, links} = sankey(data);
+  // only include nodes that are referenced by links
+  const usedIds = new Set(links.flatMap(l => [l.source, l.target]));
+  const usedNodes = nodes.filter(n => usedIds.has(n.id));
 
-        // 连线：改用半透明平滑带
-        svg.append("g").selectAll("path").data(links).join("path")
-            .attr("d", d3.sankeyLinkHorizontal()).attr("stroke", COLORS.blue).attr("stroke-opacity", 0.2)
-            .attr("fill", "none").attr("stroke-width", d => d.width);
+  let graph;
+  try {
+    graph = sankey({ nodes: usedNodes.map(d=>({...d})), links: links.map(l=>({...l})) });
+  } catch(e) { console.warn('Sankey layout error', e); return; }
 
-        // 节点
-        svg.append("g").selectAll("rect").data(nodes).join("rect")
-            .attr("x", d => d.x0).attr("y", d => d.y0).attr("width", d => d.x1 - d.x0).attr("height", d => d.y1 - d.y0)
-            .attr("fill", (d,i) => i===5 ? COLORS.green : COLORS.blue).attr("rx", 2);
+  const nodeColor = n => {
+    const m = { '营业收入':NC.revenue, '销售成本':NC.cogs, '毛利润':NC.gross,
+                '研发费用':NC.rd, '销售及行政':NC.sga, '营业利润':NC.opInc,
+                '所得税':NC.tax, '净利润':NC.net, '营业亏损':NC.opLoss, '净亏损':NC.opLoss };
+    return m[n.name] || NC.other;
+  };
 
-        // 文字：动态对齐解决遮挡
-        svg.append("g").selectAll("text").data(nodes).join("text")
-            .attr("x", d => d.x0 < width/2 ? d.x1 + 12 : d.x0 - 12)
-            .attr("y", d => (d.y0 + d.y1) / 2).attr("dy", "0.35em")
-            .attr("text-anchor", d => d.x0 < width/2 ? "start" : "end")
-            .attr("fill", "var(--text)").style("font-size", "12px").style("font-weight", "500")
-            .text(d => `${d.name} $${(d.value/1e8).toFixed(1)}亿`);
-    }
+  const grp = svg.append('g');
 
-    function renderTrend(data) {
-        const svg = d3.select("#trend-view"), width = 600, height = 400, margin = {t:20, r:40, b:40, l:40};
-        svg.selectAll("*").remove();
+  // links
+  grp.selectAll('.sk-link')
+    .data(graph.links)
+    .join('path')
+    .attr('class','sk-link')
+    .attr('d', d3.sankeyLinkHorizontal())
+    .attr('fill','none')
+    .attr('stroke', d => nodeColor(d.target))
+    .attr('stroke-width', d => Math.max(1, d.width))
+    .attr('stroke-opacity', 0.22)
+    .on('mousemove', (e,d) => showTip(
+      `<b>${d.source.name} → ${d.target.name}</b><br>${fmt(d.value,'total_revenue')}`, e))
+    .on('mouseleave', hideTip);
 
-        const x = d3.scalePoint().domain(data.map(d => d.label)).range([margin.l, width - margin.r]);
-        const yRev = d3.scaleLinear().domain([0, d3.max(data, d => +d.revenue)*1.2]).range([height - margin.b, margin.t]);
-        const yEps = d3.scaleLinear().domain([d3.min(data, d => +d.eps)*1.2, d3.max(data, d => +d.eps)*1.2]).range([height - margin.b, margin.t]);
+  // nodes
+  grp.selectAll('.sk-node')
+    .data(graph.nodes)
+    .join('rect')
+    .attr('class','sk-node')
+    .attr('x', d=>d.x0).attr('y', d=>d.y0)
+    .attr('width', d=>d.x1-d.x0).attr('height', d=>Math.max(2,d.y1-d.y0))
+    .attr('fill', nodeColor)
+    .attr('stroke', d=>d3.color(nodeColor(d))?.darker(0.6)||'#333')
+    .attr('stroke-width', 1)
+    .on('mousemove', (e,d) => {
+      const val = d.sourceLinks?.[0]?.value ?? d.targetLinks?.[0]?.value ?? 0;
+      const rev = d.name === '营业收入' ? totalRev : null;
+      let html = `<b>${d.name}</b><br>${fmt(d.value||val,'total_revenue')}`;
+      if (d.name === '毛利润') html += `<br>毛利率 ${pct(grossP, totalRev)}`;
+      if (d.name === '营业利润') html += `<br>营业利润率 ${pct(opInc, totalRev)}`;
+      if (d.name === '净利润') html += `<br>净利率 ${pct(netInc, totalRev)}`;
+      showTip(html, e);
+    })
+    .on('mouseleave', hideTip);
 
-        // 1. 营收面积图 (Revenue Area)
-        const area = d3.area().x(d => x(d.label)).y0(yRev(0)).y1(d => yRev(+d.revenue)).curve(d3.curveMonotoneX);
-        svg.append("path").datum(data).attr("fill", COLORS.blue).attr("fill-opacity", 0.1).attr("d", area);
+  // labels — right side, two lines: name + value
+  grp.selectAll('.sk-lbl-name')
+    .data(graph.nodes)
+    .join('text')
+    .attr('x', d => d.x1 + 7)
+    .attr('y', d => (d.y0+d.y1)/2 - 7)
+    .attr('dy','0.35em')
+    .attr('font-family',"'Share Tech Mono',monospace")
+    .attr('font-size', 12)
+    .attr('font-weight', '600')
+    .attr('fill', d => nodeColor(d))
+    .text(d => d.name);
 
-        // 2. EPS 趋势线 (Line)
-        const line = d3.line().x(d => x(d.label)).y(d => yEps(+d.eps)).curve(d3.curveMonotoneX);
-        svg.append("path").datum(data).attr("fill", "none").attr("stroke", COLORS.orange).attr("stroke-width", 2.5).attr("d", line);
+  grp.selectAll('.sk-lbl-val')
+    .data(graph.nodes)
+    .join('text')
+    .attr('x', d => d.x1 + 7)
+    .attr('y', d => (d.y0+d.y1)/2 + 10)
+    .attr('dy','0.35em')
+    .attr('font-family',"'Share Tech Mono',monospace")
+    .attr('font-size', 13)
+    .attr('fill', '#1a1612')
+    .text(d => {
+      const v = d.value || 0;
+      return fmt(v, 'total_revenue');
+    });
 
-        // 3. 数据点
-        svg.selectAll("circle").data(data).join("circle")
-            .attr("cx", d => x(d.label)).attr("cy", d => yEps(+d.eps)).attr("r", 4).attr("fill", COLORS.orange).attr("stroke", var("--bg")).attr("stroke-width", 2);
+  // margin % annotation on gross profit node
+  const grossNode = graph.nodes.find(n => n.name === '毛利润');
+  if (grossNode && totalRev > 0) {
+    grp.append('text')
+      .attr('x', grossNode.x1 + 7)
+      .attr('y', grossNode.y0 - 8)
+      .attr('font-family',"'Press Start 2P',monospace")
+      .attr('font-size', 7)
+      .attr('fill', NC.gross)
+      .text(`毛利率 ${pct(grossP, totalRev)}`);
+  }
+}
 
-        // 坐标轴
-        svg.append("g").attr("transform", `translate(0,${height - margin.b})`).attr("class", "axis").call(d3.axisBottom(x).tickSize(0).tickPadding(10));
-        svg.append("g").attr("transform", `translate(${margin.l},0)`).attr("class", "axis").call(d3.axisLeft(yRev).ticks(5).tickFormat(d => `$${d}B`));
-    }
+// ─── TREND ───────────────────────────────────────────────────
+function buildMetricBtns() {
+  const c = document.getElementById('metric-btns');
+  c.innerHTML = '';
+  Object.entries(METRIC_LABELS).forEach(([k,label]) => {
+    const b = document.createElement('button');
+    b.className = 'metric-btn' + (k===S.metric?' active':'');
+    b.textContent = label;
+    b.onclick = () => { S.metric = k; document.querySelectorAll('.metric-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderTrend(); };
+    c.appendChild(b);
+  });
+}
 
-    start();
-    </script>
+function renderTrend() {
+  const metric = S.metric;
+  const isEPS  = metric === 'eps_diluted';
+
+  const actual = (S.trend[S.ticker]||[])
+    .filter(r => r.period_type===S.period && r.metric===metric)
+    .map(r => ({ date: new Date(r.date), value: +r.value }))
+    .sort((a,b)=>a.date-b.date);
+
+  // estimates keyed by date string for O(1) lookup
+  const estMap = {};
+  (S.est[S.ticker]||[])
+    .filter(r => r.period_type===S.period && r.metric===metric)
+    .forEach(r => { estMap[r.date] = +r.estimate; });
+
+  // only keep estimate points that have a matching actual date (historical comparison)
+  const estPoints = actual
+    .filter(d => estMap[d3.timeFormat('%Y-%m-%d')(d.date)] != null)
+    .map(d => ({ date: d.date, estimate: estMap[d3.timeFormat('%Y-%m-%d')(d.date)] }));
+
+  document.getElementById('trend-sub').textContent =
+    `$${S.ticker} · ${METRIC_LABELS[metric]} · ${S.period==='quarterly'?'季度':'年度'}`;
+
+  const svg = d3.select('#trend-svg');
+  svg.selectAll('*').remove();
+  if (!actual.length) return;
+
+  const body = document.getElementById('trend-body');
+  const W = body.clientWidth - 32;
+  const H = 300;
+  const M = { top:24, right:20, bottom:48, left: isEPS ? 60 : 88 };
+  const iW = W - M.left - M.right;
+  const iH = H - M.top - M.bottom;
+
+  svg.attr('viewBox',`0 0 ${W} ${H}`).attr('height', H);
+  const g = svg.append('g').attr('transform',`translate(${M.left},${M.top})`);
+
+  // scales
+  const allVals = [...actual.map(d=>d.value), ...estPoints.map(d=>d.estimate)];
+  const x = d3.scaleBand().domain(actual.map(d=>d.date)).range([0,iW]).padding(0.32);
+  const yExt = d3.extent(allVals);
+  const pad  = (yExt[1]-yExt[0])*0.14 || Math.abs(yExt[0])*0.14 || 1;
+  const y    = d3.scaleLinear().domain([yExt[0]-pad, yExt[1]+pad]).range([iH,0]).nice();
+
+  // zero line
+  if (yExt[0] < 0) {
+    g.append('line').attr('x1',0).attr('x2',iW)
+      .attr('y1',y(0)).attr('y2',y(0))
+      .attr('stroke','#ccc5b0').attr('stroke-width',1.5).attr('stroke-dasharray','5 3');
+  }
+
+  // gridlines
+  g.append('g').call(
+    d3.axisLeft(y).ticks(5).tickFormat(v=>fmt(v,metric)).tickSize(-iW)
+  ).call(g2=>{
+    g2.select('.domain').remove();
+    g2.selectAll('.tick line').attr('stroke','#e0dace').attr('stroke-dasharray','3 3');
+    g2.selectAll('.tick text').attr('font-family','Share Tech Mono,monospace').attr('font-size',11).attr('fill','#9a8e78');
+  });
+
+  // x axis
+  const timeFmt = S.period==='quarterly' ? d => {
+    const q = Math.ceil((d.getMonth()+1)/3);
+    return `${d.getFullYear()%100}Q${q}`;
+  } : d => String(d.getFullYear());
+
+  g.append('g').attr('transform',`translate(0,${iH})`).call(
+    d3.axisBottom(x).tickFormat(timeFmt).tickValues(
+      actual.map(d=>d.date).filter((_,i,a)=>a.length<=10||i%Math.ceil(a.length/10)===0)
+    )
+  ).call(g2=>{
+    g2.select('.domain').attr('stroke','#ccc5b0');
+    g2.selectAll('.tick line').attr('stroke','#ccc5b0');
+    g2.selectAll('.tick text').attr('font-family','Share Tech Mono,monospace').attr('font-size',11).attr('fill','#6a5e4e').attr('dy','1.2em');
+  });
+
+  // ── bars (actual) ──
+  const barColor = d => d.value >= 0 ? NC.green : NC.red;
+
+  g.selectAll('.bar')
+    .data(actual)
+    .join('rect')
+    .attr('class','bar')
+    .attr('x', d=>x(d.date))
+    .attr('width', x.bandwidth())
+    .attr('y', d => d.value>=0 ? y(d.value) : y(0))
+    .attr('height', d => Math.abs(y(d.value)-y(0)))
+    .attr('fill', barColor)
+    .attr('stroke', d => d3.color(barColor(d)).darker(0.4))
+    .attr('stroke-width', 1)
+    .on('mousemove', (e,d) => {
+      const ds = d3.timeFormat('%Y-%m-%d')(d.date);
+      const est = estMap[ds];
+      let html = `<b>${timeFmt(d.date)}</b><br>实际: <b>${fmt(d.value,metric)}</b>`;
+      if (est != null) {
+        const diff = d.value - est;
+        const beat = diff >= 0;
+        html += `<br>预估: ${fmt(est,metric)}<br>差值: <span style="color:${beat?'#6adb8a':'#ff8a7a'}">${beat?'+':''}${fmt(diff,metric)}</span>`;
+      }
+      showTip(html, e);
+    })
+    .on('mouseleave', hideTip);
+
+  // value labels on bars (only if not too many)
+  if (actual.length <= 12) {
+    g.selectAll('.bar-lbl')
+      .data(actual)
+      .join('text')
+      .attr('class','bar-lbl')
+      .attr('x', d => x(d.date) + x.bandwidth()/2)
+      .attr('y', d => d.value>=0 ? y(d.value)-5 : y(0)+14)
+      .attr('text-anchor','middle')
+      .attr('font-family','Share Tech Mono,monospace')
+      .attr('font-size', 10)
+      .attr('fill', barColor)
+      .text(d => fmt(d.value, metric));
+  }
+
+  // ── estimate line ──
+  if (estPoints.length > 1) {
+    const lineEst = d3.line()
+      .x(d => x(d.date) + x.bandwidth()/2)
+      .y(d => y(d.estimate))
+      .curve(d3.curveMonotoneX);
+
+    g.append('path').datum(estPoints)
+      .attr('fill','none')
+      .attr('stroke', NC.blue)
+      .attr('stroke-width', 2.5)
+      .attr('stroke-dasharray','7 4')
+      .attr('d', lineEst);
+
+    g.selectAll('.est-dot')
+      .data(estPoints)
+      .join('circle')
+      .attr('class','est-dot')
+      .attr('cx', d => x(d.date)+x.bandwidth()/2)
+      .attr('cy', d => y(d.estimate))
+      .attr('r', 4)
+      .attr('fill', NC.blue)
+      .attr('stroke','#f5f2eb').attr('stroke-width',1.5)
+      .on('mousemove', (e,d) => showTip(
+        `<b>${timeFmt(d.date)}</b><br>分析师预估: ${fmt(d.estimate,metric)}`, e))
+      .on('mouseleave', hideTip);
+  }
+
+  // legend
+  const hasEst = estPoints.length > 0;
+  document.getElementById('trend-legend').innerHTML = `
+    <span class="legend-item">
+      <span class="legend-swatch" style="background:${NC.green}"></span>实际值（正）
+    </span>
+    <span class="legend-item">
+      <span class="legend-swatch" style="background:${NC.red}"></span>实际值（负）
+    </span>
+    ${hasEst ? `<span class="legend-item">
+      <span class="legend-dashed"></span>分析师预估
+    </span>` : ''}`;
+}
+
+window.addEventListener('resize', () => { if (S.ticker) { renderSankey(); renderTrend(); } });
+init();
+</script>
 </body>
 </html>
