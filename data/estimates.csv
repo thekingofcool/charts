@@ -1,0 +1,9 @@
+ticker,period_type,estimate_period,metric,estimate
+U,quarterly,0q,eps_diluted,0.2429
+U,quarterly,0q,total_revenue,514159990.0
+U,quarterly,+1q,eps_diluted,0.27104
+U,quarterly,+1q,total_revenue,536325430.0
+U,annual,0y,eps_diluted,1.05814
+U,annual,0y,total_revenue,2129948830.0
+U,annual,+1y,eps_diluted,1.31458
+U,annual,+1y,total_revenue,2428439780.0
